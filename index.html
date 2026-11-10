@@ -1,0 +1,1668 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>会回来的事物 — Things That Return</title>
+<meta name="description" content="An exhibition series on rhythm, light, motion, and the voices that come back. West Bund Art Center, Shanghai." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@900&display=swap" rel="stylesheet" />
+<style>
+
+  :root {
+    --bg: #EFECE4;
+    --ink: #111111;
+    --grey: #6B6B68;
+    --rule: rgba(17, 17, 17, 0.18);
+    --rule-strong: rgba(17, 17, 17, 0.32);
+    --tide: #FF3B1F;
+    --moon: #2B3BFF;
+    --wind: #12A150;
+    --echo: #F2A900;
+    --nav-h: 52px;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: Inter, "Noto Sans SC", system-ui, sans-serif;
+    font-weight: 400; line-height: 1.5;
+    -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  .progress { position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 120; pointer-events: none; }
+  .progress-bar { height: 100%; width: 0%; background: var(--ink); transition: background-color 0.35s; }
+  body[data-active="tide"] .progress-bar { background: var(--tide); }
+  body[data-active="moon"] .progress-bar { background: var(--moon); }
+  body[data-active="wind"] .progress-bar { background: var(--wind); }
+  body[data-active="echo"] .progress-bar { background: var(--echo); }
+  .chapter-rail {
+    position: fixed; right: clamp(10px, 2vw, 22px); top: 50%; transform: translateY(-50%);
+    z-index: 90; display: flex; flex-direction: column; gap: 10px; align-items: flex-end;
+  }
+  .chapter-rail a {
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; font-weight: 500;
+    letter-spacing: 0.08em; color: var(--grey); display: flex; align-items: center; gap: 8px;
+    transition: color 0.25s;
+  }
+  .chapter-rail a .n { opacity: 0.7; }
+  .chapter-rail a .dot {
+    width: 6px; height: 6px; border-radius: 50%; border: 1px solid var(--grey); background: transparent;
+  }
+  .chapter-rail a.active { color: var(--ink); }
+  .chapter-rail a.active .dot { background: var(--rail-accent, var(--ink)); border-color: var(--rail-accent, var(--ink)); }
+  .chapter-rail a[data-chapter="tide"].active { --rail-accent: var(--tide); }
+  .chapter-rail a[data-chapter="moon"].active { --rail-accent: var(--moon); }
+  .chapter-rail a[data-chapter="wind"].active { --rail-accent: var(--wind); }
+  .chapter-rail a[data-chapter="echo"].active { --rail-accent: var(--echo); }
+  .site-nav {
+    position: fixed; top: 2px; left: 0; right: 0; height: var(--nav-h); z-index: 100;
+    display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    padding: 0 clamp(16px, 3.5vw, 40px);
+    background: color-mix(in srgb, var(--bg) 90%, transparent);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.35s var(--ease), transform 0.4s var(--ease);
+  }
+  .site-nav.scrolled { border-bottom-color: var(--rule); }
+  .site-nav.hidden-enter { transform: translateY(-110%); pointer-events: none; }
+  .nav-brand { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+  .nav-brand .cn { font-family: "Noto Serif SC", serif; font-weight: 900; font-size: 14px; white-space: nowrap; }
+  .nav-brand .en {
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; font-weight: 500; color: var(--grey);
+    letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .nav-chapters { display: flex; align-items: center; gap: clamp(10px, 1.8vw, 24px); }
+  .nav-chapters a {
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; font-weight: 500;
+    letter-spacing: 0.1em; color: var(--grey); position: relative; padding: 6px 0; transition: color 0.25s;
+  }
+  .nav-chapters a:hover { color: var(--ink); }
+  .nav-chapters a.active { color: var(--ink); }
+  .nav-chapters a.active::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--accent, var(--ink));
+  }
+  .nav-chapters a[data-chapter="tide"].active { --accent: var(--tide); }
+  .nav-chapters a[data-chapter="moon"].active { --accent: var(--moon); }
+  .nav-chapters a[data-chapter="wind"].active { --accent: var(--wind); }
+  .nav-chapters a[data-chapter="echo"].active { --accent: var(--echo); }
+  .nav-visit {
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; font-weight: 500;
+    letter-spacing: 0.08em; border-bottom: 1px solid var(--ink); padding-bottom: 2px; flex-shrink: 0;
+  }
+  .nav-visit:hover { opacity: 0.55; }
+  .enter {
+    position: fixed; inset: 0; z-index: 200; background: var(--bg);
+    display: grid; place-items: center;
+    transition: opacity 0.9s var(--ease), visibility 0.9s;
+  }
+  .enter.is-gone { opacity: 0; visibility: hidden; pointer-events: none; }
+  .enter-inner { text-align: center; padding: 40px; position: relative; }
+  .enter-bleed {
+    position: absolute; inset: -40% -20%;
+    font-family: "Archivo Black", sans-serif; font-size: clamp(80px, 22vw, 220px);
+    line-height: 0.85; letter-spacing: -0.05em; color: transparent;
+    -webkit-text-stroke: 1px rgba(17,17,17,0.08); pointer-events: none; user-select: none; text-align: left;
+  }
+  .enter-series {
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--grey); margin-bottom: 22px; position: relative;
+  }
+  .enter-title {
+    font-family: "Noto Serif SC", serif; font-weight: 900;
+    font-size: clamp(40px, 8vw, 80px); line-height: 1.1; margin-bottom: 10px; position: relative;
+  }
+  .enter-en {
+    font-family: "Archivo Black", sans-serif; font-size: clamp(13px, 2vw, 18px);
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--grey); margin-bottom: 48px; position: relative;
+  }
+  .enter-btn {
+    font-family: "IBM Plex Mono", monospace; font-size: 12px; font-weight: 500;
+    letter-spacing: 0.16em; text-transform: uppercase; padding: 14px 4px;
+    border-bottom: 1.5px solid var(--ink); position: relative;
+  }
+  .enter-btn:hover { opacity: 0.5; }
+  .enter-hint {
+    margin-top: 18px; font-family: "IBM Plex Mono", monospace; font-size: 10px;
+    color: var(--grey); letter-spacing: 0.08em; position: relative;
+  }
+  .wrap { width: min(1280px, calc(100% - clamp(32px, 6vw, 80px))); margin-inline: auto; }
+  .reveal {
+    opacity: 0; transform: translateY(22px);
+    transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+  }
+  .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
+
+  .marquee {
+    border-block: 1px solid var(--rule); background: var(--bg); overflow: hidden;
+    white-space: nowrap; padding: 12px 0; position: relative; z-index: 5;
+  }
+  .marquee.ink { background: var(--ink); border-color: transparent; color: var(--bg); }
+  .marquee.ink .marquee-track { color: var(--bg); }
+  .marquee-track {
+    display: inline-flex; animation: marqueeScroll 42s linear infinite;
+    font-family: "IBM Plex Mono", monospace; font-size: 12px; font-weight: 500;
+    letter-spacing: 0.12em; text-transform: uppercase; will-change: transform;
+  }
+  .marquee:hover .marquee-track { animation-play-state: paused; }
+  .marquee-track span { padding: 0 28px; position: relative; }
+  .marquee-track span::after { content: "·"; position: absolute; right: -2px; opacity: 0.45; }
+  @keyframes marqueeScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) { .marquee-track { animation: none; } }
+
+  .hero {
+    min-height: 100vh; min-height: 100dvh; padding: calc(var(--nav-h) + 28px) 0 0;
+    position: relative; overflow: hidden;
+  }
+  .hero-mega-bg {
+    position: absolute; left: -4vw; top: 18%;
+    font-family: "Archivo Black", sans-serif; font-size: clamp(72px, 18vw, 220px);
+    line-height: 0.82; letter-spacing: -0.05em; color: transparent;
+    -webkit-text-stroke: 1.5px rgba(17,17,17,0.1); pointer-events: none; user-select: none;
+    white-space: nowrap; z-index: 0;
+  }
+  .hero-layout {
+    position: relative; z-index: 1; display: grid; grid-template-columns: 1.05fr 0.95fr;
+    gap: clamp(20px, 4vw, 48px); align-items: start; padding-bottom: 28px;
+  }
+  .hero-ledger {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
+    border-top: 1px solid var(--rule-strong); border-bottom: 1px solid var(--rule-strong); margin-bottom: 28px;
+  }
+  .hero-ledger > div { padding: 10px 12px; border-right: 1px solid var(--rule); }
+  .hero-ledger > div:last-child { border-right: 0; }
+  .hero-ledger .k {
+    font-family: "IBM Plex Mono", monospace; font-size: 9px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--grey); margin-bottom: 4px;
+  }
+  .hero-ledger .v { font-family: "IBM Plex Mono", monospace; font-size: 12px; font-weight: 500; }
+  .hero-copy-grid { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: clamp(16px, 2vw, 28px); align-items: start; }
+  .hero-copy { min-width: 0; }
+  .hero-title-cn {
+    font-family: "Noto Serif SC", serif; font-weight: 900;
+    font-size: clamp(48px, min(8vw, 10vh), 104px); line-height: 1; letter-spacing: -0.02em;
+    writing-mode: vertical-rl; white-space: nowrap; height: auto; margin: 0;
+  }
+  .hero-title-en {
+    font-family: "Archivo Black", sans-serif; font-size: clamp(36px, 6.5vw, 78px);
+    line-height: 0.88; letter-spacing: -0.045em; margin-bottom: 18px;
+  }
+  .hero-thesis { font-size: clamp(15px, 1.35vw, 18px); font-weight: 500; line-height: 1.5; max-width: 38ch; margin-bottom: 8px; }
+  .hero-thesis-cn { font-family: "Noto Sans SC", sans-serif; font-size: 13px; color: var(--grey); line-height: 1.7; max-width: 30em; min-width: 260px; text-wrap: pretty; margin-bottom: 20px; }
+  .hero-intro { font-size: 14px; line-height: 1.65; max-width: 46ch; border-left: 2px solid var(--ink); padding-left: 14px; margin-bottom: 8px; }
+  .hero-intro-cn { font-family: "Noto Sans SC", sans-serif; font-size: 13px; color: var(--grey); line-height: 1.7; max-width: 34em; min-width: 260px; text-wrap: pretty; padding-left: 16px; margin-bottom: 22px; }
+  .hero-cta-row {
+    display: flex; flex-wrap: wrap; gap: 18px 28px; align-items: center;
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .hero-cta-row a { border-bottom: 1px solid var(--ink); padding-bottom: 2px; }
+  .hero-cta-row a:hover { opacity: 0.5; }
+  .hero-cta-row .muted { color: var(--grey); border: 0; }
+  .hero-collage { position: relative; min-height: clamp(380px, 58vh, 620px); margin-top: 8px; }
+  .collage-piece {
+    position: absolute; border: 1px solid var(--rule);
+    background: color-mix(in srgb, var(--bg) 88%, var(--ink));
+    display: grid; place-items: center; overflow: hidden;
+  }
+  .collage-piece { --cut: color-mix(in srgb, var(--bg) 88%, var(--ink)); }
+  .collage-piece svg { width: 70%; height: 70%; }
+  .collage-piece .tag {
+    position: absolute; top: 8px; left: 10px; font-family: "IBM Plex Mono", monospace;
+    font-size: 10px; letter-spacing: 0.08em; color: var(--grey);
+  }
+  .collage-piece .word {
+    position: absolute; bottom: 8px; right: 10px;
+    font-family: "Archivo Black", sans-serif; font-size: 14px; letter-spacing: -0.02em;
+  }
+  .collage-piece.p1 { width: 58%; height: 58%; left: 0; top: 0; z-index: 2; }
+  .collage-piece.p2 { width: 42%; height: 42%; right: 0; top: 8%; z-index: 3; }
+  .collage-piece.p3 { width: 36%; height: 40%; left: 18%; bottom: 0; z-index: 4; }
+  .collage-piece.p4 { width: 48%; height: 46%; right: 4%; bottom: 4%; z-index: 1; }
+  .collage-ghost {
+    position: absolute; font-family: "Noto Serif SC", serif; font-weight: 900;
+    font-size: clamp(64px, 10vw, 120px); color: rgba(17,17,17,0.05);
+    right: -2%; top: 30%; writing-mode: vertical-rl; pointer-events: none; z-index: 0;
+  }
+  .hero-scroll {
+    display: flex; align-items: center; gap: 12px; padding: 18px 0 10px;
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--grey);
+  }
+  .hero-scroll .line { width: 40px; height: 1px; background: var(--grey); animation: scrollPulse 2.2s ease-in-out infinite; }
+  @keyframes scrollPulse {
+    0%, 100% { transform: scaleX(1); opacity: 0.35; }
+    50% { transform: scaleX(1.4); opacity: 1; }
+  }
+
+  .series { padding: 56px 0 64px; }
+  .series-head {
+    display: grid; grid-template-columns: 1fr 1.4fr 1fr; gap: 20px; align-items: end;
+    margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--rule-strong);
+  }
+  .series-head h2 {
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; font-weight: 500;
+    letter-spacing: 0.18em; text-transform: uppercase;
+  }
+  .series-head .mid { font-size: 15px; font-weight: 500; line-height: 1.45; }
+  .series-head .right {
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--grey);
+    text-align: right; letter-spacing: 0.04em;
+  }
+  .series-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border: 1px solid var(--rule-strong); }
+  .series-card {
+    display: flex; flex-direction: column; min-height: 320px; padding: 16px 14px 14px;
+    border-right: 1px solid var(--rule); position: relative; overflow: hidden;
+    transition: background 0.35s var(--ease), color 0.35s;
+  }
+  .series-card:last-child { border-right: 0; }
+  .series-card::before {
+    content: attr(data-num); position: absolute; right: -6px; top: -18px;
+    font-family: "Archivo Black", sans-serif; font-size: clamp(72px, 9vw, 110px);
+    line-height: 1; letter-spacing: -0.06em; color: rgba(17,17,17,0.06);
+    pointer-events: none; transition: color 0.35s;
+  }
+  .series-card:hover { background: var(--card-accent); color: var(--bg); }
+  .series-card:hover::before { color: rgba(239,236,228,0.18); }
+  .series-card:hover .no, .series-card:hover .dates, .series-card:hover .kw {
+    color: color-mix(in srgb, var(--bg) 75%, transparent);
+  }
+  .series-card .no {
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.12em;
+    color: var(--grey); margin-bottom: 6px; position: relative;
+  }
+  .series-card .word {
+    font-family: "Archivo Black", sans-serif; font-size: clamp(32px, 3.6vw, 48px);
+    line-height: 0.9; letter-spacing: -0.04em; position: relative;
+  }
+  .series-card .cn {
+    font-family: "Noto Serif SC", serif; font-weight: 900; font-size: 18px;
+    margin-top: 4px; position: relative;
+  }
+  .series-card .dates {
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; color: var(--grey);
+    letter-spacing: 0.04em; margin-top: 8px; position: relative;
+  }
+  .series-card .kw {
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.06em;
+    color: var(--grey); margin-top: 10px; line-height: 1.5; position: relative;
+  }
+  .series-card .thumb { margin-top: auto; padding-top: 16px; height: 100px; display: grid; place-items: center; position: relative; }
+  .series-card .thumb svg { width: 84px; height: 84px; }
+  .series-card { --cut: var(--bg); }
+  .anim-tide .bar { fill: var(--cut, #EFECE4); }
+  .series-card[data-ch="tide"] { --card-accent: var(--tide); }
+  .series-card[data-ch="moon"] { --card-accent: var(--moon); }
+  .series-card[data-ch="wind"] { --card-accent: var(--wind); }
+  .series-card[data-ch="echo"] { --card-accent: var(--echo); }
+
+  .chapter {
+    min-height: 100vh; min-height: 100svh; padding: calc(var(--nav-h) + 28px) 0 calc(72px + 40px);
+    display: flex; flex-direction: column; justify-content: center;
+    position: relative; border-top: 1px solid var(--rule); overflow: hidden;
+  }
+  .chapter::before {
+    content: ""; position: absolute; inset: 0; background: var(--ch-accent); opacity: 0.07; pointer-events: none;
+  }
+  .chapter-wash-ink {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 72px;
+    background: var(--ink); color: var(--bg); display: flex; align-items: center; overflow: hidden; z-index: 2;
+  }
+  .chapter-wash-ink .strip-track {
+    display: inline-flex; white-space: nowrap;
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: 0.14em;
+    text-transform: uppercase; animation: marqueeScroll 38s linear infinite;
+  }
+  .chapter-wash-ink .strip-track span { padding: 0 24px; }
+  .chapter-inner {
+    flex: 0 0 auto; width: min(1280px, calc(100% - clamp(32px, 6vw, 80px))); margin-inline: auto;
+    position: relative; z-index: 1;
+  }
+  .chapter-top {
+    display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center;
+    padding-bottom: 14px; margin-bottom: 8px; border-bottom: 1px solid var(--rule-strong);
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .chapter-top .dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--ch-accent);
+    display: inline-block; margin-right: 8px; vertical-align: middle;
+  }
+  .chapter-top .mid { color: var(--grey); text-align: center; }
+  .chapter-top .right { color: var(--grey); }
+  .chapter-layout {
+    display: grid; grid-template-columns: 1.05fr 0.95fr;
+    gap: clamp(24px, 4vw, 56px); align-items: start; padding-top: 20px;
+  }
+  .chapter-layout.flip { direction: rtl; }
+  .chapter-layout.flip > * { direction: ltr; }
+  .mega-wrap { position: relative; margin-bottom: 8px; }
+  .mega {
+    font-family: "Archivo Black", sans-serif; font-size: clamp(72px, 14vw, 168px);
+    line-height: 0.82; letter-spacing: -0.05em; position: relative; z-index: 2;
+  }
+  .mega-ghost {
+    position: absolute; left: -2%; top: 42%;
+    font-family: "Archivo Black", sans-serif; font-size: clamp(90px, 18vw, 210px);
+    line-height: 0.8; letter-spacing: -0.06em; color: transparent;
+    -webkit-text-stroke: 1px color-mix(in srgb, var(--ch-accent) 35%, transparent);
+    z-index: 0; pointer-events: none; white-space: nowrap; user-select: none;
+  }
+  .title-row { display: flex; align-items: flex-start; gap: 18px; margin-bottom: 12px; }
+  .vertical-cn {
+    writing-mode: vertical-rl; font-family: "Noto Serif SC", serif; font-weight: 900;
+    font-size: clamp(28px, 3.2vw, 42px); letter-spacing: 0.14em; line-height: 1;
+    height: auto; white-space: nowrap; color: var(--ch-accent);
+  }
+  .pinyin {
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: 0.18em;
+    color: var(--grey); margin-bottom: 18px;
+  }
+  .wall-labels { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+  .wall-labels span {
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; font-weight: 500;
+    letter-spacing: 0.1em; text-transform: uppercase; padding: 6px 10px; border: 1px solid var(--rule-strong);
+  }
+  .intro-en { font-size: clamp(18px, 1.7vw, 24px); font-weight: 500; line-height: 1.4; max-width: 30ch; margin-bottom: 10px; }
+  .intro-cn { font-family: "Noto Sans SC", sans-serif; font-size: 14px; color: var(--grey); line-height: 1.7; max-width: 30em; text-wrap: pretty; margin-bottom: 22px; }
+  .about-block {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; padding: 16px 0;
+    border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); margin-bottom: 20px;
+  }
+  .about-block h3 {
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--grey); margin-bottom: 8px;
+  }
+  .about-block p { font-size: 13px; line-height: 1.65; }
+  .about-block .cn-p { font-family: "Noto Sans SC", sans-serif; font-size: 13px; color: var(--grey); line-height: 1.7; text-wrap: pretty; }
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border: 1px solid var(--rule-strong); }
+  .stats-grid > div { padding: 12px 12px 14px; border-right: 1px solid var(--rule); }
+  .stats-grid > div:last-child { border-right: 0; }
+  .stats-grid .k {
+    font-family: "IBM Plex Mono", monospace; font-size: 9px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--grey); margin-bottom: 6px;
+  }
+  .stats-grid .v { font-size: 14px; font-weight: 600; line-height: 1.35; }
+  .motif-stage {
+    aspect-ratio: 1; width: min(100%, 560px); margin-inline: auto;
+    border: 1px solid var(--rule-strong); display: grid; place-items: center; position: relative;
+    --cut: color-mix(in srgb, var(--bg) 92%, var(--ch-accent));
+    background: var(--cut); overflow: hidden;
+  }
+  .motif-stage .bleed-word {
+    position: absolute; left: -8%; bottom: -6%;
+    font-family: "Archivo Black", sans-serif; font-size: clamp(64px, 12vw, 140px);
+    line-height: 0.8; letter-spacing: -0.05em;
+    color: color-mix(in srgb, var(--ch-accent) 18%, transparent);
+    pointer-events: none; z-index: 0; white-space: nowrap;
+  }
+  .motif-stage svg {
+    width: 78%; height: 78%; position: relative; z-index: 1;
+    transition: transform 0.45s var(--ease); will-change: transform;
+  }
+  .motif-caption {
+    position: absolute; bottom: 12px; left: 14px; right: 14px; display: flex; justify-content: space-between;
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.1em;
+    color: var(--grey); text-transform: uppercase; z-index: 2;
+  }
+  .motif-side-note { margin-top: 14px; font-size: 13px; line-height: 1.6; color: var(--grey); max-width: 42ch; }
+  #chapter-tide { --ch-accent: var(--tide); }
+  #chapter-moon { --ch-accent: var(--moon); }
+  #chapter-wind { --ch-accent: var(--wind); }
+  #chapter-echo { --ch-accent: var(--echo); }
+
+  .visit { padding: 80px 0 0; border-top: 1px solid var(--rule); background: var(--bg); }
+  .visit-top { display: grid; grid-template-columns: 1fr 1.2fr; gap: clamp(28px, 5vw, 64px); margin-bottom: 48px; }
+  .visit h2 {
+    font-family: "Noto Serif SC", serif; font-weight: 900;
+    font-size: clamp(40px, 6vw, 64px); line-height: 1.05; margin-bottom: 8px;
+  }
+  .visit .sub {
+    font-family: "Archivo Black", sans-serif; font-size: 14px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--grey); margin-bottom: 20px;
+  }
+  .visit-lede { font-size: 15px; line-height: 1.65; max-width: 40ch; margin-bottom: 10px; }
+  .visit-lede-cn { font-family: "Noto Sans SC", sans-serif; font-size: 13px; color: var(--grey); line-height: 1.7; max-width: 32em; text-wrap: pretty; }
+  .visit-list { display: flex; flex-direction: column; }
+  .visit-row {
+    display: grid; grid-template-columns: 110px 1fr; gap: 16px; padding: 14px 0; border-top: 1px solid var(--rule);
+  }
+  .visit-row:last-child { border-bottom: 1px solid var(--rule); }
+  .visit-row .k {
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; font-weight: 500;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey); padding-top: 3px;
+  }
+  .visit-row .v { font-size: 15px; font-weight: 500; line-height: 1.5; }
+  .calendar { margin-bottom: 56px; }
+  .calendar h3 {
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: 0.16em;
+    text-transform: uppercase; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--rule-strong);
+  }
+  .cal-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .cal-table th {
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; font-weight: 500;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--grey);
+    text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--rule);
+  }
+  .cal-table td { padding: 14px 12px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+  .cal-table tr:hover td { background: color-mix(in srgb, var(--bg) 85%, var(--ink)); }
+  .cal-table .swatch { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; vertical-align: middle; }
+  .cal-table .word { font-family: "Archivo Black", sans-serif; font-size: 16px; letter-spacing: -0.02em; }
+  .cal-table .cn { font-family: "Noto Serif SC", serif; font-weight: 900; font-size: 14px; margin-left: 8px; }
+  .cal-table a { border-bottom: 1px solid transparent; }
+  .cal-table a:hover { border-bottom-color: var(--ink); }
+  .colophon { background: var(--ink); color: var(--bg); padding: 48px 0 36px; margin-top: 8px; }
+  .colophon-grid { display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr; gap: 28px; margin-bottom: 36px; }
+  .colophon h4 {
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.14em;
+    text-transform: uppercase; opacity: 0.55; margin-bottom: 12px;
+  }
+  .colophon p, .colophon a { font-size: 13px; line-height: 1.6; }
+  .colophon a:hover { opacity: 0.6; }
+  .colophon .big { font-family: "Noto Serif SC", serif; font-weight: 900; font-size: 22px; margin-bottom: 6px; }
+  .colophon .en-big {
+    font-family: "Archivo Black", sans-serif; font-size: 12px; letter-spacing: 0.1em;
+    text-transform: uppercase; opacity: 0.55; margin-bottom: 14px;
+  }
+  .colophon-bottom {
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding-top: 20px;
+    border-top: 1px solid rgba(239,236,228,0.18);
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.08em; opacity: 0.55;
+  }
+  .back-top {
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: 0.1em;
+    text-transform: uppercase; border-bottom: 1px solid currentColor; padding-bottom: 2px; display: inline-block;
+  }
+  .back-top:hover { opacity: 0.55; }
+
+  .anim-tide .bar { transform-origin: center; animation: tideBreathe 4.5s ease-in-out infinite; }
+  .anim-tide .bar:nth-child(2) { animation-delay: 0.15s; }
+  .anim-tide .bar:nth-child(3) { animation-delay: 0.3s; }
+  .anim-tide .bar:nth-child(4) { animation-delay: 0.45s; }
+  .anim-tide .bar:nth-child(5) { animation-delay: 0.6s; }
+  .anim-tide .bar:nth-child(6) { animation-delay: 0.75s; }
+  @keyframes tideBreathe {
+    0%, 100% { transform: scaleX(1); opacity: 1; }
+    50% { transform: scaleX(1.04); opacity: 0.85; }
+  }
+  .anim-moon .crescent { transform-origin: 50% 50%; animation: moonPhase 8s ease-in-out infinite; }
+  .anim-moon .ghost { animation: moonGhost 8s ease-in-out infinite; }
+  @keyframes moonPhase {
+    0%, 100% { transform: rotate(0deg) translateX(0); }
+    50% { transform: rotate(8deg) translateX(4px); }
+  }
+  @keyframes moonGhost { 0%, 100% { opacity: 0.35; } 50% { opacity: 0.7; } }
+  .anim-wind .vbar { transform-origin: bottom center; animation: windWave 3.8s ease-in-out infinite; }
+  .anim-wind .vbar:nth-child(2) { animation-delay: 0.12s; }
+  .anim-wind .vbar:nth-child(3) { animation-delay: 0.24s; }
+  .anim-wind .vbar:nth-child(4) { animation-delay: 0.36s; }
+  .anim-wind .vbar:nth-child(5) { animation-delay: 0.48s; }
+  .anim-wind .vbar:nth-child(6) { animation-delay: 0.6s; }
+  .anim-wind .vbar:nth-child(7) { animation-delay: 0.72s; }
+  @keyframes windWave {
+    0%, 100% { transform: scaleY(1) translateY(0); }
+    50% { transform: scaleY(1.06) translateY(-3px); }
+  }
+  .anim-echo .ring { transform-origin: center; animation: echoPulse 4.2s ease-out infinite; }
+  .anim-echo .ring:nth-child(2) { animation-delay: 0.35s; }
+  .anim-echo .ring:nth-child(3) { animation-delay: 0.7s; }
+  .anim-echo .ring:nth-child(4) { animation-delay: 1.05s; }
+  .anim-echo .ring:nth-child(5) { animation-delay: 1.4s; }
+  .anim-echo .ring:nth-child(6) { animation-delay: 1.75s; }
+  .anim-echo .ring:nth-child(7) { animation-delay: 2.1s; }
+  @keyframes echoPulse { 0% { opacity: 0.15; } 40% { opacity: 1; } 100% { opacity: 0.15; } }
+  @media (prefers-reduced-motion: reduce) {
+    .anim-tide .bar, .anim-moon .crescent, .anim-moon .ghost, .anim-wind .vbar,
+    .anim-echo .ring, .hero-scroll .line, .chapter-wash-ink .strip-track { animation: none !important; }
+  }
+
+  @media (max-width: 980px) {
+    .chapter-rail { display: none; }
+    .nav-brand .en { display: none; }
+    .hero-layout { grid-template-columns: 1fr; }
+    .hero-copy-grid { grid-template-columns: 1fr; }
+    .hero-title-cn {
+      writing-mode: horizontal-tb; height: auto; margin-bottom: 8px;
+      font-size: clamp(40px, 12vw, 64px);
+    }
+    .hero-ledger { grid-template-columns: 1fr 1fr; }
+    .hero-ledger > div:nth-child(2n) { border-right: 0; }
+    .hero-ledger > div:nth-child(1), .hero-ledger > div:nth-child(2) { border-bottom: 1px solid var(--rule); }
+    .hero-collage { min-height: 420px; }
+    .series-head { grid-template-columns: 1fr; gap: 8px; }
+    .series-head .right { text-align: left; }
+    .series-grid { grid-template-columns: 1fr 1fr; }
+    .series-card:nth-child(2n) { border-right: 0; }
+    .series-card:nth-child(1), .series-card:nth-child(2) { border-bottom: 1px solid var(--rule); }
+    .chapter-layout, .chapter-layout.flip { grid-template-columns: 1fr; direction: ltr; }
+    .vertical-cn { writing-mode: horizontal-tb; height: auto; letter-spacing: 0.08em; }
+    .mega { font-size: clamp(64px, 20vw, 110px); }
+    .about-block { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+    .stats-grid > div:nth-child(2n) { border-right: 0; }
+    .stats-grid > div:nth-child(1), .stats-grid > div:nth-child(2) { border-bottom: 1px solid var(--rule); }
+    .visit-top { grid-template-columns: 1fr; }
+    .colophon-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 560px) {
+    .nav-chapters { display: none; }
+    .series-grid { grid-template-columns: 1fr; }
+    .series-card { border-right: 0; border-bottom: 1px solid var(--rule); min-height: 260px; }
+    .series-card:last-child { border-bottom: 0; }
+    .hero-ledger { grid-template-columns: 1fr; }
+    .hero-ledger > div { border-right: 0; border-bottom: 1px solid var(--rule); }
+    .stats-grid { grid-template-columns: 1fr; }
+    .stats-grid > div { border-right: 0; border-bottom: 1px solid var(--rule); }
+    .colophon-grid { grid-template-columns: 1fr; }
+    .cal-table .hide-sm { display: none; }
+    .mega-ghost { display: none; }
+    .collage-piece.p3 { display: none; }
+  }
+
+  /* ===== v4 kinetic layer ===== */
+  [data-burst] { cursor: pointer; }
+  .sr-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+  #burst-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 150; }
+  .hero-layout { grid-template-columns: 0.9fr 1.1fr; }
+  .hero-collage { min-height: clamp(420px, 64vh, 660px); }
+  .collage-piece .tag, .collage-piece .word { z-index: 3; background: var(--bg); padding: 1px 5px; }
+  .collage-piece .kin { position: absolute; overflow: visible; }
+  .collage-piece.p1 .kin { width: 150%; height: 150%; left: -6%; top: -22%; }
+  .collage-piece.p4 .kin { width: 175%; height: 175%; left: -8%; top: -12%; }
+  .collage-piece canvas.kin { inset: 0; width: 100%; height: 100%; }
+  .collage-piece .kin-wind { position: absolute; inset: 0; }
+  .kin-wind .wind-word, .wind-stage .wind-word {
+    position: absolute; inset: 0; display: grid; place-items: center;
+    font-family: "Archivo Black", sans-serif; color: var(--ink); line-height: 0.8; letter-spacing: -0.06em;
+    white-space: nowrap; font-size: 80px; pointer-events: none;
+  }
+  .wind-cols { position: absolute; inset: 0; display: grid; gap: 3px; }
+  .wind-cols i {
+    display: block; background: var(--wind); transform-origin: 50% 0%;
+    transition: transform 0.62s cubic-bezier(0.77, 0, 0.18, 1);
+  }
+  .wind-cols i:nth-child(even) { transform-origin: 50% 100%; }
+  .kin-wind .wind-cols { gap: 2px; }
+
+  .chapter-layout { grid-template-columns: 0.85fr 1.15fr; align-items: center; }
+  .mega { font-size: clamp(72px, 10.5vw, 156px); }
+  .mega-ghost { font-size: clamp(90px, 14vw, 196px); }
+  .motif-stage { width: min(100%, 660px, calc(100svh - 270px)); min-width: 300px; }
+  .motif-stage svg { width: 86%; height: 86%; transition: none; overflow: visible; }
+  .motif-stage .motif-caption span { background: var(--bg); padding: 2px 6px; color: var(--ink); }
+  .motif-stage .stage-index {
+    position: absolute; top: 12px; left: 14px; right: 14px; display: flex; justify-content: space-between; z-index: 3;
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; pointer-events: none;
+  }
+  .motif-stage .stage-index span { background: var(--bg); padding: 2px 6px; }
+  .series-card .thumb { height: 150px; }
+  .series-card .thumb svg { width: 128px; height: 128px; }
+  .moon-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; display: block; }
+  .wind-stage { position: absolute; inset: 0; z-index: 1; }
+  .intro-en { margin-bottom: 6px; }
+  .intro-cn { margin-bottom: 18px; }
+  .stats-grid .v { font-size: 13px; }
+
+  .flash {
+    position: absolute; inset: 0; z-index: 8; background: var(--bg);
+    display: none; align-items: center; justify-content: center; overflow: hidden; pointer-events: none;
+  }
+  .flash.on { display: flex; }
+  .flash .fw {
+    font-family: "Archivo Black", sans-serif; color: var(--ink); line-height: 0.8;
+    letter-spacing: -0.05em; white-space: nowrap; font-size: 100px;
+  }
+  .flash .fw.cn { font-family: "Noto Serif SC", serif; font-weight: 900; letter-spacing: 0; line-height: 1; }
+  .flash .fmeta {
+    position: absolute; left: clamp(16px, 3.5vw, 40px); right: clamp(16px, 3.5vw, 40px); bottom: 24px;
+    display: flex; justify-content: space-between;
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  }
+  .flash .fmeta .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--ch-accent); margin-right: 8px; vertical-align: -1px; }
+
+  .matrix {
+    --cell: 40px; position: relative; overflow: hidden; background: var(--rule);
+    border-block: 1px solid var(--rule-strong); display: flex; flex-direction: column; gap: 1px;
+  }
+  .matrix .mrow { display: flex; gap: 1px; will-change: transform; }
+  .matrix .mc {
+    flex: 0 0 var(--cell); height: var(--cell); background: var(--bg); color: var(--bg);
+    display: grid; place-items: center;
+  }
+  .matrix .mc.ink { background: var(--ink); color: var(--ink); }
+  .matrix .mc svg { width: 72%; height: 72%; }
+  .matrix .mc.blank svg { display: none; }
+  .matrix-label {
+    position: absolute; left: 0; top: 0; z-index: 2; background: var(--ink); color: var(--bg);
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    height: var(--cell); display: flex; align-items: center; padding: 0 14px;
+  }
+  @media (max-width: 980px) {
+    .chapter-layout, .chapter-layout.flip { grid-template-columns: 1fr; }
+    .motif-stage { width: min(100%, 560px); }
+    .collage-piece.p1 .kin, .collage-piece.p4 .kin { width: 130%; height: 130%; left: -10%; top: -10%; }
+  }
+  @media (max-width: 560px) { .matrix { --cell: 32px; } }
+  .chapter-rail a { background: color-mix(in srgb, var(--bg) 88%, transparent); padding: 2px 4px; }
+  @media (prefers-reduced-motion: reduce) { .wind-cols i, .matrix .mrow { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<svg class="sr-sprite" aria-hidden="true" focusable="false">
+  <symbol id="mx-tide" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="#FF3B1F"/><rect x="8" y="30" width="84" height="6" fill="currentColor"/><rect x="8" y="46" width="84" height="9" fill="currentColor"/><rect x="8" y="64" width="84" height="12" fill="currentColor"/></symbol>
+  <symbol id="mx-moon" viewBox="0 0 100 100"><path d="M60 14a38 38 0 1 0 0 72 30 30 0 1 1 0-72z" fill="#2B3BFF"/></symbol>
+  <symbol id="mx-wind" viewBox="0 0 100 100"><rect x="14" y="30" width="10" height="40" fill="#12A150"/><rect x="32" y="20" width="12" height="60" fill="#12A150"/><rect x="52" y="12" width="14" height="76" fill="#12A150"/><rect x="74" y="6" width="16" height="88" fill="#12A150"/></symbol>
+  <symbol id="mx-echo" viewBox="0 0 100 100"><circle cx="50" cy="50" r="12" fill="none" stroke="#F2A900" stroke-width="7"/><circle cx="50" cy="50" r="27" fill="none" stroke="#F2A900" stroke-width="6"/><circle cx="50" cy="50" r="42" fill="none" stroke="#F2A900" stroke-width="5"/></symbol>
+</svg>
+<canvas id="burst-canvas" aria-hidden="true"></canvas>
+<div class="progress" aria-hidden="true"><div class="progress-bar" id="progress-bar"></div></div>
+
+<div class="enter" id="enter" role="dialog" aria-label="Enter exhibition">
+  <div class="enter-inner">
+    <div class="enter-bleed" aria-hidden="true">RETURN<br/>RETURN<br/>RETURN</div>
+    <p class="enter-series">West Bund Art Center · Shanghai · No.07–10</p>
+    <h1 class="enter-title">会回来的事物</h1>
+    <p class="enter-en">Things That Return</p>
+    <button type="button" class="enter-btn" id="enter-btn">点击进入 / Enter</button>
+    <p class="enter-hint">Esc to skip</p>
+  </div>
+</div>
+
+<header class="site-nav hidden-enter" id="site-nav">
+  <a class="nav-brand" href="#hero">
+    <span class="cn">会回来的事物</span>
+    <span class="en">Things That Return</span>
+  </a>
+  <nav class="nav-chapters" aria-label="Chapters">
+    <a href="#chapter-tide" data-chapter="tide">TIDE</a>
+    <a href="#chapter-moon" data-chapter="moon">MOON</a>
+    <a href="#chapter-wind" data-chapter="wind">WIND</a>
+    <a href="#chapter-echo" data-chapter="echo">ECHO</a>
+  </nav>
+  <a class="nav-visit" href="#visit">Visit / 参观</a>
+</header>
+
+<nav class="chapter-rail" aria-label="Chapter index">
+  <a href="#chapter-tide" data-chapter="tide"><span class="n">01</span><span class="dot"></span></a>
+  <a href="#chapter-moon" data-chapter="moon"><span class="n">02</span><span class="dot"></span></a>
+  <a href="#chapter-wind" data-chapter="wind"><span class="n">03</span><span class="dot"></span></a>
+  <a href="#chapter-echo" data-chapter="echo"><span class="n">04</span><span class="dot"></span></a>
+</nav>
+
+<main>
+  <section class="hero" id="hero">
+    <div class="hero-mega-bg" aria-hidden="true">THINGS THAT RETURN</div>
+    <div class="wrap">
+      <div class="hero-ledger reveal">
+        <div><p class="k">Series</p><p class="v">No.07 — No.10</p></div>
+        <div><p class="k">Venue</p><p class="v">West Bund / SH</p></div>
+        <div><p class="k">Span</p><p class="v">2026.11 — 2027.06</p></div>
+        <div><p class="k">Entry</p><p class="v">FREE · Tue–Sun</p></div>
+      </div>
+      <div class="hero-layout">
+        <div class="reveal">
+          <div class="hero-copy-grid">
+          <h1 class="hero-title-cn">会回来的事物</h1>
+          <div class="hero-copy">
+          <p class="hero-title-en">Things<br/>That<br/>Return</p>
+          <p class="hero-thesis">Four chapters on rhythm, light, motion, and the voices that come back.</p>
+          <p class="hero-thesis-cn">四章：节律、光影、运动，以及那些回到我们身边的声音。</p>
+          <div class="hero-cta-row">
+            <a href="#series">Series overview →</a>
+            <a href="#chapter-tide">Begin with TIDE</a>
+            <span class="muted">Keys 1–4 · Click a motif</span>
+          </div>
+          </div>
+          </div>
+        </div>
+        <div class="hero-collage reveal" aria-hidden="true">
+          <span class="collage-ghost">回</span>
+          <div class="collage-piece p1">
+            <span class="tag">No.07</span>
+            <svg class="kin" viewBox="0 0 100 100" data-kin="tide" data-auto="9" data-burst="tide"></svg>
+            <span class="word">TIDE</span>
+          </div>
+          <div class="collage-piece p2">
+            <span class="tag">No.08</span>
+            <canvas class="kin" data-kin="moon" data-n="18" data-burst="moon"></canvas>
+            <span class="word">MOON</span>
+          </div>
+          <div class="collage-piece p3">
+            <span class="tag">No.09</span>
+            <div class="kin-wind" data-kin="wind" data-cols="8" data-burst="wind"><span class="wind-word">WIND</span><div class="wind-cols"></div></div>
+            <span class="word">WIND</span>
+          </div>
+          <div class="collage-piece p4">
+            <span class="tag">No.10</span>
+            <svg class="kin" viewBox="0 0 100 100" data-kin="echo" data-burst="echo"></svg>
+            <span class="word">ECHO</span>
+          </div>
+        </div>
+      </div>
+      <p class="hero-scroll"><span class="line"></span> Scroll · 系列总览</p>
+    </div>
+  </section>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span>会回来的事物</span><span>Things That Return</span><span>No.07–10</span><span>West Bund Art Center</span><span>Shanghai</span><span>Free Entry</span><span>Tue–Sun 10:00–18:00</span><span>2026.11 — 2027.06</span><span>TIDE · MOON · WIND · ECHO</span>
+      <span>会回来的事物</span><span>Things That Return</span><span>No.07–10</span><span>West Bund Art Center</span><span>Shanghai</span><span>Free Entry</span><span>Tue–Sun 10:00–18:00</span><span>2026.11 — 2027.06</span><span>TIDE · MOON · WIND · ECHO</span>
+    </div>
+  </div>
+
+  <section class="series" id="series">
+    <div class="wrap">
+      <div class="series-head reveal">
+        <h2>Series · 系列墙</h2>
+        <p class="mid">Four forces. Click a motif to shatter it.</p>
+        <p class="right">01 / 04 — 04 / 04</p>
+      </div>
+      <div class="series-grid">
+        <a class="series-card reveal" data-ch="tide" data-num="07" href="#chapter-tide">
+          <span class="no">No.07 · Chapter 01</span>
+          <span class="word">TIDE</span>
+          <span class="cn">潮汐</span>
+          <span class="dates">21.11 — 20.12.2026</span>
+          <span class="kw">Gravity · Cycle · Return</span>
+          <div class="thumb" aria-hidden="true">
+            <svg class="anim-tide" data-burst="tide" viewBox="0 0 100 100" fill="none">
+              <circle cx="50" cy="50" r="38" fill="#FF3B1F"/>
+              <clipPath id="tide-clip-2"><circle cx="50" cy="50" r="38"/></clipPath>
+              <g clip-path="url(#tide-clip-2)">
+                <rect class="bar" x="12" y="28" width="76" height="5" fill="#EFECE4"/>
+                <rect class="bar" x="12" y="38" width="76" height="7" fill="#EFECE4"/>
+                <rect class="bar" x="12" y="50" width="76" height="9" fill="#EFECE4"/>
+                <rect class="bar" x="12" y="64" width="76" height="11" fill="#EFECE4"/>
+              </g>
+            </svg>
+          </div>
+        </a>
+        <a class="series-card reveal" data-ch="moon" data-num="08" href="#chapter-moon">
+          <span class="no">No.08 · Chapter 02</span>
+          <span class="word">MOON</span>
+          <span class="cn">月相</span>
+          <span class="dates">08.01 — 07.02.2027</span>
+          <span class="kw">Light · Shadow · Phase</span>
+          <div class="thumb" aria-hidden="true">
+            <svg class="anim-moon" data-burst="moon" viewBox="0 0 100 100" fill="none">
+              <circle class="ghost" cx="50" cy="50" r="34" stroke="#2B3BFF" stroke-width="1.5" fill="none" opacity="0.4"/>
+              <path class="crescent" d="M58 18a34 34 0 1 0 0 64 26 26 0 1 1 0-64z" fill="#2B3BFF"/>
+            </svg>
+          </div>
+        </a>
+        <a class="series-card reveal" data-ch="wind" data-num="09" href="#chapter-wind">
+          <span class="no">No.09 · Chapter 03</span>
+          <span class="word">WIND</span>
+          <span class="cn">风向</span>
+          <span class="dates">05.03 — 04.04.2027</span>
+          <span class="kw">Motion · Force · Drift</span>
+          <div class="thumb" aria-hidden="true">
+            <svg class="anim-wind" data-burst="wind" viewBox="0 0 100 100" fill="none">
+              <rect class="vbar" x="18" y="30" width="5" height="40" fill="#12A150"/>
+              <rect class="vbar" x="28" y="24" width="7" height="52" fill="#12A150"/>
+              <rect class="vbar" x="40" y="18" width="9" height="64" fill="#12A150"/>
+              <rect class="vbar" x="54" y="14" width="11" height="72" fill="#12A150"/>
+              <rect class="vbar" x="70" y="10" width="13" height="80" fill="#12A150"/>
+            </svg>
+          </div>
+        </a>
+        <a class="series-card reveal" data-ch="echo" data-num="10" href="#chapter-echo">
+          <span class="no">No.10 · Chapter 04</span>
+          <span class="word">ECHO</span>
+          <span class="cn">回声</span>
+          <span class="dates">07.05 — 06.06.2027</span>
+          <span class="kw">Sound · Distance · Voice</span>
+          <div class="thumb" aria-hidden="true">
+            <svg class="anim-echo" data-burst="echo" viewBox="0 0 100 100" fill="none">
+              <circle class="ring" cx="50" cy="50" r="10" stroke="#F2A900" stroke-width="2" fill="none"/>
+              <circle class="ring" cx="50" cy="50" r="18" stroke="#F2A900" stroke-width="2" fill="none"/>
+              <circle class="ring" cx="50" cy="50" r="26" stroke="#F2A900" stroke-width="2" fill="none"/>
+              <circle class="ring" cx="50" cy="50" r="34" stroke="#F2A900" stroke-width="1.5" fill="none"/>
+              <circle class="ring" cx="50" cy="50" r="42" stroke="#F2A900" stroke-width="1.25" fill="none"/>
+            </svg>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+    <div class="matrix" data-matrix aria-hidden="true"><span class="matrix-label">Matrix · Series</span></div>
+  <div class="marquee ink" aria-hidden="true">
+    <div class="marquee-track">
+      <span>Chapter 01 — TIDE 潮汐</span><span>Chapter 02 — MOON 月相</span><span>Chapter 03 — WIND 风向</span><span>Chapter 04 — ECHO 回声</span><span>West Bund · Free Entry</span>
+      <span>Chapter 01 — TIDE 潮汐</span><span>Chapter 02 — MOON 月相</span><span>Chapter 03 — WIND 风向</span><span>Chapter 04 — ECHO 回声</span><span>West Bund · Free Entry</span>
+    </div>
+  </div>
+
+    <section class="chapter" id="chapter-tide" data-chapter="tide">
+    <div class="chapter-inner">
+      <div class="chapter-top reveal">
+        <div><span class="dot"></span>No.07 · Chapter 01 / 04</div>
+        <div class="mid">Horizontal cut · Accent #FF3B1F</div>
+        <div class="right">2026.11.21 — 12.20</div>
+      </div>
+      <div class="chapter-layout">
+        <div class="reveal">
+          <div class="mega-wrap">
+            <span class="mega-ghost" aria-hidden="true">TIDE</span>
+            <h2 class="mega">TIDE</h2>
+          </div>
+          <div class="title-row">
+            <p class="vertical-cn">潮汐</p>
+            <div>
+              <p class="pinyin">CHÁO XĪ</p>
+              <div class="wall-labels"><span>Gravity</span><span>Cycle</span><span>Return</span></div>
+              <p class="intro-en">Rhythm, gravity, and the things that always return.</p>
+              <p class="intro-cn">关于节律、引力，以及那些总会回来的事物。</p>
+            </div>
+          </div>
+          <div class="stats-grid">
+            <div><p class="k">Dates</p><p class="v">2026.11.21 — 12.20</p></div>
+            <div><p class="k">Hours</p><p class="v">10:00—18:00<br/>Tue–Sun</p></div>
+            <div><p class="k">Venue</p><p class="v">West Bund Art Center</p></div>
+            <div><p class="k">Entry</p><p class="v">Free · 30 days</p></div>
+          </div>
+        </div>
+        <div class="reveal">
+          <div class="motif-stage" data-stage="tide">
+            <span class="bleed-word">TIDE</span>
+            <svg viewBox="0 0 100 100" data-kin="tide" data-burst="tide" data-hover="stage" aria-hidden="true"></svg>
+            <div class="stage-index"><span>No.07</span><span>TIDE / 潮汐</span></div>
+            <div class="motif-caption"><span>Move cursor · Slit shear</span><span>Click · Shatter</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="chapter-wash-ink" aria-hidden="true">
+      <div class="strip-track">
+        <span>TIDE 潮汐</span><span>No.07</span><span>Gravity</span><span>Cycle</span><span>Return</span><span>2026 / 11 / 21 — 12 / 20</span><span>West Bund Art Center</span><span>Free entry</span>
+        <span>TIDE 潮汐</span><span>No.07</span><span>Gravity</span><span>Cycle</span><span>Return</span><span>2026 / 11 / 21 — 12 / 20</span><span>West Bund Art Center</span><span>Free entry</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="matrix" data-matrix aria-hidden="true"><span class="matrix-label">Matrix · 01→02</span></div>
+  <section class="chapter" id="chapter-moon" data-chapter="moon">
+    <div class="chapter-inner">
+      <div class="chapter-top reveal">
+        <div><span class="dot"></span>No.08 · Chapter 02 / 04</div>
+        <div class="mid">Phase · Accent #2B3BFF</div>
+        <div class="right">2027.01.08 — 02.07</div>
+      </div>
+      <div class="chapter-layout flip">
+        <div class="reveal">
+          <div class="mega-wrap">
+            <span class="mega-ghost" aria-hidden="true">MOON</span>
+            <h2 class="mega">MOON</h2>
+          </div>
+          <div class="title-row">
+            <p class="vertical-cn">月相</p>
+            <div>
+              <p class="pinyin">YUÈ XIÀNG</p>
+              <div class="wall-labels"><span>Light</span><span>Shadow</span><span>Phase</span></div>
+              <p class="intro-en">Light, shadow, and the faces we only show in turn.</p>
+              <p class="intro-cn">关于光、影，以及那些轮流显现的面孔。</p>
+            </div>
+          </div>
+          <div class="stats-grid">
+            <div><p class="k">Dates</p><p class="v">2027.01.08 — 02.07</p></div>
+            <div><p class="k">Hours</p><p class="v">10:00—18:00<br/>Tue–Sun</p></div>
+            <div><p class="k">Venue</p><p class="v">West Bund Art Center</p></div>
+            <div><p class="k">Entry</p><p class="v">Free · 31 days</p></div>
+          </div>
+        </div>
+        <div class="reveal">
+          <div class="motif-stage" data-stage="moon">
+            <span class="bleed-word">MOON</span>
+            <canvas class="moon-canvas" data-kin="moon" data-n="34" data-wait="flash" data-burst="moon" aria-hidden="true"></canvas>
+            <div class="stage-index"><span>No.08</span><span>MOON / 月相</span></div>
+            <div class="motif-caption"><span>Move cursor · Scroll · Tumble</span><span>Click · Shatter</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="chapter-wash-ink" aria-hidden="true">
+      <div class="strip-track">
+        <span>MOON 月相</span><span>No.08</span><span>Light</span><span>Shadow</span><span>Phase</span><span>2027 / 01 / 08 — 02 / 07</span><span>West Bund Art Center</span><span>Free entry</span>
+        <span>MOON 月相</span><span>No.08</span><span>Light</span><span>Shadow</span><span>Phase</span><span>2027 / 01 / 08 — 02 / 07</span><span>West Bund Art Center</span><span>Free entry</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="matrix" data-matrix aria-hidden="true"><span class="matrix-label">Matrix · 02→03</span></div>
+  <section class="chapter" id="chapter-wind" data-chapter="wind">
+    <div class="chapter-inner">
+      <div class="chapter-top reveal">
+        <div><span class="dot"></span>No.09 · Chapter 03 / 04</div>
+        <div class="mid">Vertical force · Accent #12A150</div>
+        <div class="right">2027.03.05 — 04.04</div>
+      </div>
+      <div class="chapter-layout">
+        <div class="reveal">
+          <div class="mega-wrap">
+            <span class="mega-ghost" aria-hidden="true">WIND</span>
+            <h2 class="mega">WIND</h2>
+          </div>
+          <div class="title-row">
+            <p class="vertical-cn">风向</p>
+            <div>
+              <p class="pinyin">FĒNG XIÀNG</p>
+              <div class="wall-labels"><span>Motion</span><span>Force</span><span>Drift</span></div>
+              <p class="intro-en">Motion, direction, and what we cannot see but feel.</p>
+              <p class="intro-cn">关于运动、方向，以及看不见却感受得到的事物。</p>
+            </div>
+          </div>
+          <div class="stats-grid">
+            <div><p class="k">Dates</p><p class="v">2027.03.05 — 04.04</p></div>
+            <div><p class="k">Hours</p><p class="v">10:00—18:00<br/>Tue–Sun</p></div>
+            <div><p class="k">Venue</p><p class="v">West Bund Art Center</p></div>
+            <div><p class="k">Entry</p><p class="v">Free · 31 days</p></div>
+          </div>
+        </div>
+        <div class="reveal">
+          <div class="motif-stage" data-stage="wind">
+            
+            <div class="wind-stage" data-kin="wind" data-cols="12" data-scroll="1" data-burst="wind" aria-hidden="true"><span class="wind-word">WIND</span><div class="wind-cols"></div></div>
+            <div class="stage-index"><span>No.09</span><span>WIND / 风向</span></div>
+            <div class="motif-caption"><span>Scroll · Curtain grid</span><span>Click · Shatter</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="chapter-wash-ink" aria-hidden="true">
+      <div class="strip-track">
+        <span>WIND 风向</span><span>No.09</span><span>Motion</span><span>Force</span><span>Drift</span><span>2027 / 03 / 05 — 04 / 04</span><span>West Bund Art Center</span><span>Free entry</span>
+        <span>WIND 风向</span><span>No.09</span><span>Motion</span><span>Force</span><span>Drift</span><span>2027 / 03 / 05 — 04 / 04</span><span>West Bund Art Center</span><span>Free entry</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="matrix" data-matrix aria-hidden="true"><span class="matrix-label">Matrix · 03→04</span></div>
+  <section class="chapter" id="chapter-echo" data-chapter="echo">
+    <div class="chapter-inner">
+      <div class="chapter-top reveal">
+        <div><span class="dot"></span>No.10 · Chapter 04 / 04</div>
+        <div class="mid">Concentric return · Accent #F2A900</div>
+        <div class="right">2027.05.07 — 06.06</div>
+      </div>
+      <div class="chapter-layout flip">
+        <div class="reveal">
+          <div class="mega-wrap">
+            <span class="mega-ghost" aria-hidden="true">ECHO</span>
+            <h2 class="mega">ECHO</h2>
+          </div>
+          <div class="title-row">
+            <p class="vertical-cn">回声</p>
+            <div>
+              <p class="pinyin">HUÍ SHĒNG</p>
+              <div class="wall-labels"><span>Sound</span><span>Distance</span><span>Voice</span></div>
+              <p class="intro-en">Sound, distance, and the voices that come back.</p>
+              <p class="intro-cn">关于声音、距离，以及那些回到我们身边的声音。</p>
+            </div>
+          </div>
+          <div class="stats-grid">
+            <div><p class="k">Dates</p><p class="v">2027.05.07 — 06.06</p></div>
+            <div><p class="k">Hours</p><p class="v">10:00—18:00<br/>Tue–Sun</p></div>
+            <div><p class="k">Venue</p><p class="v">West Bund Art Center</p></div>
+            <div><p class="k">Entry</p><p class="v">Free · 31 days</p></div>
+          </div>
+        </div>
+        <div class="reveal">
+          <div class="motif-stage" data-stage="echo">
+            <span class="bleed-word">ECHO</span>
+            <svg viewBox="0 0 100 100" data-kin="echo" data-burst="echo" data-hover="stage" aria-hidden="true"></svg>
+            <div class="stage-index"><span>No.10</span><span>ECHO / 回声</span></div>
+            <div class="motif-caption"><span>Hover · Interference</span><span>Click · Shatter</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="chapter-wash-ink" aria-hidden="true">
+      <div class="strip-track">
+        <span>ECHO 回声</span><span>No.10</span><span>Sound</span><span>Distance</span><span>Voice</span><span>2027 / 05 / 07 — 06 / 06</span><span>West Bund Art Center</span><span>Free entry</span>
+        <span>ECHO 回声</span><span>No.10</span><span>Sound</span><span>Distance</span><span>Voice</span><span>2027 / 05 / 07 — 06 / 06</span><span>West Bund Art Center</span><span>Free entry</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="matrix" data-matrix aria-hidden="true"><span class="matrix-label">Visit · 参观</span></div>
+  <section class="visit" id="visit">
+    <div class="wrap">
+      <div class="visit-top">
+        <div class="reveal">
+          <h2>参观信息</h2>
+          <p class="sub">Visit · Colophon</p>
+          <p class="visit-lede">West Bund Art Center · 西岸艺术中心 · Shanghai. Four chapters, one series, free entry.</p>
+          <p class="visit-lede-cn">「会回来的事物」四章展览，西岸艺术中心，周二至周日开放，免费入场。</p>
+        </div>
+        <div class="visit-list reveal">
+          <div class="visit-row">
+            <span class="k">Venue</span>
+            <span class="v">West Bund Art Center · 西岸艺术中心 · Shanghai</span>
+          </div>
+          <div class="visit-row">
+            <span class="k">Hours</span>
+            <span class="v">10:00 — 18:00 · Tue–Sun · Closed Mondays</span>
+          </div>
+          <div class="visit-row">
+            <span class="k">Admission</span>
+            <span class="v">Free entry / 免费入场</span>
+          </div>
+          <div class="visit-row">
+            <span class="k">Series</span>
+            <span class="v">2026 / 11 / 21 — 2027 / 06 / 06</span>
+          </div>
+          <div class="visit-row">
+            <span class="k">Chapters</span>
+            <span class="v">TIDE · MOON · WIND · ECHO · No.07 — No.10</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="calendar reveal">
+        <h3>Series calendar · 展览日程</h3>
+        <table class="cal-table">
+          <thead>
+            <tr>
+              <th>No.</th>
+              <th>Chapter</th>
+              <th class="hide-sm">Keywords</th>
+              <th>Dates</th>
+              <th>Accent</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>07</td>
+              <td><a href="#chapter-tide"><span class="swatch" style="background:var(--tide)"></span><span class="word">TIDE</span><span class="cn">潮汐</span></a></td>
+              <td class="hide-sm">Gravity / Cycle / Return</td>
+              <td>2026 / 11 / 21 — 12 / 20</td>
+              <td>#FF3B1F</td>
+            </tr>
+            <tr>
+              <td>08</td>
+              <td><a href="#chapter-moon"><span class="swatch" style="background:var(--moon)"></span><span class="word">MOON</span><span class="cn">月相</span></a></td>
+              <td class="hide-sm">Light / Shadow / Phase</td>
+              <td>2027 / 01 / 08 — 02 / 07</td>
+              <td>#2B3BFF</td>
+            </tr>
+            <tr>
+              <td>09</td>
+              <td><a href="#chapter-wind"><span class="swatch" style="background:var(--wind)"></span><span class="word">WIND</span><span class="cn">风向</span></a></td>
+              <td class="hide-sm">Motion / Force / Drift</td>
+              <td>2027 / 03 / 05 — 04 / 04</td>
+              <td>#12A150</td>
+            </tr>
+            <tr>
+              <td>10</td>
+              <td><a href="#chapter-echo"><span class="swatch" style="background:var(--echo)"></span><span class="word">ECHO</span><span class="cn">回声</span></a></td>
+              <td class="hide-sm">Sound / Distance / Voice</td>
+              <td>2027 / 05 / 07 — 06 / 06</td>
+              <td>#F2A900</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <footer class="colophon">
+      <div class="wrap">
+        <div class="colophon-grid">
+          <div>
+            <p class="big">会回来的事物</p>
+            <p class="en-big">Things That Return</p>
+            <p>Exhibition microsite for the four-poster series.</p>
+          </div>
+          <div>
+            <h4>Chapters</h4>
+            <p><a href="#chapter-tide">01 TIDE 潮汐</a><br/>
+            <a href="#chapter-moon">02 MOON 月相</a><br/>
+            <a href="#chapter-wind">03 WIND 风向</a><br/>
+            <a href="#chapter-echo">04 ECHO 回声</a></p>
+          </div>
+          <div>
+            <h4>Visit</h4>
+            <p>West Bund Art Center<br/>西岸艺术中心<br/>Shanghai<br/>Tue–Sun 10:00–18:00<br/>Free entry</p>
+          </div>
+          <div>
+            <h4>System</h4>
+            <p>Bg #EFECE4 · Ink #111<br/>Grey #6B6B68<br/>Fonts: Noto Serif SC, Archivo Black, IBM Plex Mono, Inter / Noto Sans SC<br/>Motifs: SVG + Canvas, live</p>
+            <p style="margin-top:16px"><a class="back-top" href="#hero">↑ Back to top</a></p>
+          </div>
+        </div>
+        <div class="colophon-bottom">
+          <span>会回来的事物 · Things That Return · No.07–10</span>
+          <span>West Bund Art Center · Shanghai · 2026–2027</span>
+        </div>
+      </div>
+    </footer>
+  </section>
+</main>
+
+<script>
+(function () {
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const enter = document.getElementById("enter");
+  const nav = document.getElementById("site-nav");
+  const enterBtn = document.getElementById("enter-btn");
+  const progressBar = document.getElementById("progress-bar");
+  const COL = { tide: "#FF3B1F", moon: "#2B3BFF", wind: "#12A150", echo: "#F2A900" };
+  const INK = "#111111", BG = "#EFECE4";
+  const SVGNS = "http://www.w3.org/2000/svg";
+  let uid = 0;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const rand = (a, b) => a + Math.random() * (b - a);
+
+  /* ---------- enter / nav / progress (unchanged behaviour) ---------- */
+  function dismissEnter() {
+    enter.classList.add("is-gone");
+    nav.classList.remove("hidden-enter");
+    document.body.style.overflow = "";
+  }
+  const skipEnter = /[?&]skip\b/.test(location.search) || (location.hash && location.hash.length > 1);
+  if (reduce || skipEnter) {
+    dismissEnter();
+  } else {
+    document.body.style.overflow = "hidden";
+    enterBtn.addEventListener("click", dismissEnter);
+    document.addEventListener("keydown", function onEsc(e) {
+      if (e.key === "Escape" && !enter.classList.contains("is-gone")) {
+        dismissEnter();
+        document.removeEventListener("keydown", onEsc);
+      }
+    });
+  }
+  let scrollDelta = 0, lastY = window.scrollY, scrollVel = 0;
+  const onScroll = () => {
+    nav.classList.toggle("scrolled", window.scrollY > 12);
+    const doc = document.documentElement;
+    const max = doc.scrollHeight - doc.clientHeight;
+    progressBar.style.width = (max > 0 ? (doc.scrollTop / max) * 100 : 0) + "%";
+    scrollDelta += window.scrollY - lastY; lastY = window.scrollY;
+  };
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+
+  const reveals = document.querySelectorAll(".reveal");
+  if (!reduce && "IntersectionObserver" in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => { if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); } });
+    }, { threshold: 0.1, rootMargin: "0px 0px -6% 0px" });
+    reveals.forEach((el) => io.observe(el));
+  } else reveals.forEach((el) => el.classList.add("in"));
+
+  const chapters = document.querySelectorAll(".chapter[data-chapter]");
+  const navLinks = document.querySelectorAll(".nav-chapters a[data-chapter]");
+  const railLinks = document.querySelectorAll(".chapter-rail a[data-chapter]");
+  function setActive(id) {
+    document.body.setAttribute("data-active", id || "");
+    navLinks.forEach((a) => a.classList.toggle("active", a.getAttribute("data-chapter") === id));
+    railLinks.forEach((a) => a.classList.toggle("active", a.getAttribute("data-chapter") === id));
+  }
+  if ("IntersectionObserver" in window) {
+    const chapterIO = new IntersectionObserver((entries) => {
+      entries.forEach((en) => { if (en.isIntersecting) setActive(en.target.getAttribute("data-chapter")); });
+    }, { threshold: 0.35 });
+    chapters.forEach((ch) => chapterIO.observe(ch));
+  }
+  const chapterIds = ["chapter-tide", "chapter-moon", "chapter-wind", "chapter-echo"];
+  document.addEventListener("keydown", (e) => {
+    if (e.target.matches("input, textarea, [contenteditable]")) return;
+    const n = parseInt(e.key, 10);
+    if (n >= 1 && n <= 4) {
+      const el = document.getElementById(chapterIds[n - 1]);
+      if (el) el.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
+    }
+  });
+
+  /* ---------- module registry: only visible modules tick ---------- */
+  const mods = [];
+  const visIO = "IntersectionObserver" in window ? new IntersectionObserver((es) => {
+    es.forEach((e) => {
+      const m = e.target.__mod; if (!m) return;
+      m.visible = e.isIntersecting;
+      if (m.visible && m.onShow) m.onShow();
+    });
+  }, { rootMargin: "80px 0px" }) : null;
+  function register(m) {
+    m.el.__mod = m; mods.push(m);
+    if (reduce) { m.renderStatic && m.renderStatic(); return; }
+    if (visIO) visIO.observe(m.el); else m.visible = true;
+  }
+  function hoverTracker(target) {
+    const h = { on: false, x: 0, y: 0, px: 0, py: 0, vx: 0, vy: 0 };
+    target.addEventListener("pointermove", (e) => {
+      const r = target.getBoundingClientRect();
+      const nx = e.clientX - r.left, ny = e.clientY - r.top;
+      if (h.on) { h.vx = nx - h.px; h.vy = ny - h.py; }
+      h.px = nx; h.py = ny; h.x = nx / r.width - 0.5; h.y = ny / r.height - 0.5; h.on = true;
+    });
+    target.addEventListener("pointerleave", () => { h.on = false; h.vx = h.vy = 0; });
+    return h;
+  }
+
+  /* ---------- TIDE: disc sliced into horizontal bands, slit-scan shear ---------- */
+  function tideLayout(R, n, gapMax) {
+    const gaps = [];
+    for (let i = 0; i < n - 1; i++) gaps.push(0.25 + gapMax * Math.pow((i + 1) / (n - 1), 1.6));
+    const sum = gaps.reduce((a, b) => a + b, 0);
+    const h = (2 * R - sum) / n; const out = []; let y = 50 - R;
+    for (let i = 0; i < n; i++) { out.push([y, h]); y += h + (gaps[i] || 0); }
+    return out;
+  }
+  function buildTide(svg) {
+    const R = 42, n = 14, id = "td" + (uid++);
+    const bands = tideLayout(R, n, 3.4);
+    let defs = "", gs = "";
+    bands.forEach(([y, h], i) => {
+      defs += `<clipPath id="${id}c${i}"><rect x="-300" y="${y.toFixed(2)}" width="700" height="${h.toFixed(2)}"/></clipPath>`;
+      gs += `<g><circle cx="50" cy="50" r="${R}" fill="${COL.tide}" clip-path="url(#${id}c${i})"/></g>`;
+    });
+    svg.innerHTML = `<defs>${defs}</defs>${gs}`;
+    const groups = [...svg.querySelectorAll(":scope > g")];
+    const st = groups.map(() => ({ x: 0, v: 0, last: 1e9 }));
+    const auto = parseFloat(svg.dataset.auto || "0");
+    const hoverEl = svg.dataset.hover === "stage" ? svg.closest(".motif-stage") : svg.closest(".collage-piece") || svg;
+    const hv = hoverTracker(hoverEl);
+    let nextPulse = 1.2, pulseAt = -10;
+    const set = (i, x) => { if (Math.abs(x - st[i].last) > 0.02) { groups[i].setAttribute("transform", `translate(${x.toFixed(2)} 0)`); st[i].last = x; } };
+    register({
+      el: svg,
+      tick(t, dt) {
+        if (t > nextPulse && !hv.on) { pulseAt = t; nextPulse = t + 4.2; }
+        const wp = (t - pulseAt) / 0.85 * (n + 4) - 2;
+        for (let i = 0; i < n; i++) {
+          const dir = i % 2 ? 1 : -1, f = i / (n - 1);
+          let tgt = 0;
+          if (hv.on) tgt += hv.x * 2 * (10 + 20 * f) * dir;
+          tgt += clamp(scrollVel * 0.9, -26, 26) * dir * (0.3 + 0.7 * f);
+          if (auto) tgt += Math.sin(t * 1.5 + i * 0.6) * auto * dir;
+          if (wp < n + 3) tgt += 16 * dir * Math.exp(-((i - wp) ** 2) / 2.2);
+          const s = st[i];
+          const a = 190 * (tgt - s.x) - 10 * s.v;   // under-damped spring = elastic snap
+          s.v += a * dt; s.x += s.v * dt;
+          set(i, s.x);
+        }
+      },
+      renderStatic() { for (let i = 0; i < n; i++) set(i, (i % 2 ? 1 : -1) * (1 + 7 * i / (n - 1))); }
+    });
+  }
+
+  /* ---------- ECHO: rotating rings with text/dots on paths + turbulence jitter ---------- */
+  function buildEcho(svg) {
+    const id = "ec" + (uid++);
+    const radii = [9, 16, 23, 30, 37, 44];
+    const seg = "ECHO · 回声 · RETURN · ";
+    let defs = `<filter id="${id}f" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="1.2" xChannelSelector="R" yChannelSelector="G"/></filter>`;
+    let gs = "";
+    radii.forEach((r, i) => {
+      const sw = (2.6 - i * 0.28).toFixed(2);
+      let extra = "";
+      if (i % 2 === 1) {
+        const tr = r + 2.2, circ = 2 * Math.PI * tr, fs = 2.6;
+        defs += `<path id="${id}p${i}" d="M${50 - tr},50 a${tr},${tr} 0 1,1 ${2 * tr},0 a${tr},${tr} 0 1,1 ${-2 * tr},0"/>`;
+        const reps = Math.max(1, Math.round(circ / (fs * 0.62 * seg.length)));
+        extra = `<text font-family="IBM Plex Mono, monospace" font-size="${fs}" font-weight="500" fill="${INK}"><textPath href="#${id}p${i}" textLength="${(circ * 0.995).toFixed(2)}" lengthAdjust="spacing">${seg.repeat(reps)}</textPath></text>`;
+      } else {
+        const dr = r - 2.4, step = (2 * Math.PI * dr) / (12 + i * 6);
+        extra = `<circle cx="50" cy="50" r="${dr}" fill="none" stroke="${INK}" stroke-width="1.1" stroke-linecap="round" stroke-dasharray="0.01 ${step.toFixed(3)}"/>`;
+      }
+      gs += `<g><circle cx="50" cy="50" r="${r}" fill="none" stroke="${COL.echo}" stroke-width="${sw}"/>${extra}</g>`;
+    });
+    svg.innerHTML = `<defs>${defs}</defs><g filter="url(#${id}f)">${gs}</g>`;
+    const outer = svg.querySelector(":scope > g");
+    const rings = [...outer.children];
+    const turb = svg.querySelector("feTurbulence"), disp = svg.querySelector("feDisplacementMap");
+    const hoverEl = svg.dataset.hover === "stage" ? svg.closest(".motif-stage") : svg.closest(".collage-piece") || svg;
+    const hv = hoverTracker(hoverEl);
+    const ang = radii.map(() => Math.random() * 360);
+    let seedT = 0, seed = 1, boost = 0;
+    register({
+      el: svg,
+      tick(t, dt) {
+        boost += ((hv.on ? 1 : 0) - boost) * Math.min(1, dt * 4);
+        rings.forEach((g, i) => {
+          const sp = (7 + i * 3) * (i % 2 ? -1 : 1) * (1 + boost * 1.8);
+          ang[i] = (ang[i] + sp * dt) % 360;
+          g.setAttribute("transform", `rotate(${ang[i].toFixed(2)} 50 50)`);
+        });
+        seedT += dt;
+        if (seedT > 0.09) {
+          seedT = 0; seed = (seed % 97) + 1;
+          turb.setAttribute("seed", seed);
+          turb.setAttribute("baseFrequency", (0.03 + 0.012 * Math.sin(t * 0.7)).toFixed(4));
+          disp.setAttribute("scale", (1.1 + boost * 3.2 + Math.min(3, Math.abs(scrollVel) * 0.15)).toFixed(2));
+        }
+      },
+      renderStatic() { outer.removeAttribute("filter"); }
+    });
+  }
+
+  /* ---------- WIND: strict column grid curtains over giant black word ---------- */
+  function fitWord(span, box, frac) {
+    span.style.fontSize = "100px";
+    const w = span.scrollWidth || span.offsetWidth, h = 80;
+    const fs = Math.min(100 * box.clientWidth * frac / Math.max(1, w), box.clientHeight * 0.9 / h * 100);
+    span.style.fontSize = fs.toFixed(1) + "px";
+  }
+  function buildWind(el) {
+    const n = parseInt(el.dataset.cols || "12", 10);
+    const cols = el.querySelector(".wind-cols"), word = el.querySelector(".wind-word");
+    cols.style.gridTemplateColumns = `repeat(${n}, 1fr)`;
+    const inner = document.createElement("span");
+    inner.textContent = word.textContent; word.textContent = ""; word.appendChild(inner);
+    inner.style.display = "inline-block";
+    const fit = () => { word.style.fontSize = ""; inner.style.fontSize = "100px"; const w = inner.offsetWidth; inner.style.fontSize = ""; word.style.fontSize = Math.min(100 * el.clientWidth * 0.94 / Math.max(1, w), el.clientHeight * 1.05) .toFixed(1) + "px"; };
+    fit(); window.addEventListener("resize", fit);
+    if (document.fonts) document.fonts.ready.then(fit);
+    const bars = []; for (let i = 0; i < n; i++) { const b = document.createElement("i"); b.style.transitionDelay = (i * 0.028).toFixed(3) + "s"; cols.appendChild(b); bars.push(b); }
+    const last = new Array(n).fill(-1);
+    const chapter = el.closest(".chapter");
+    const set = (i, q) => { if (q !== last[i]) { bars[i].style.transform = `scaleY(${q})`; last[i] = q; } };
+    register({
+      el,
+      tick(t) {
+        let p = 0;
+        if (el.dataset.scroll && chapter) {
+          const r = chapter.getBoundingClientRect(), vh = window.innerHeight;
+          p = clamp((vh - r.top) / (vh + r.height), 0, 1);
+        }
+        const phase = p * 2.4 + t * 0.16;
+        for (let i = 0; i < n; i++) {
+          const raw = 0.5 + 0.5 * Math.sin((phase - (i / n) * 0.85) * Math.PI * 2);
+          set(i, Math.round(raw * 4) / 4);
+        }
+      },
+      renderStatic() { for (let i = 0; i < n; i++) set(i, [1, 0.25, 0.75, 0, 1, 0.5][i % 6]); }
+    });
+  }
+
+  /* ---------- MOON: crescents falling and piling, tiny rigid-body physics ---------- */
+  const moonSprites = (() => {
+    const mk = (ghost) => {
+      const c = document.createElement("canvas"); c.width = c.height = 256; const g = c.getContext("2d");
+      if (ghost) { g.strokeStyle = COL.moon; g.lineWidth = 9; g.beginPath(); g.arc(128, 128, 116, 0, Math.PI * 2); g.stroke(); g.fillStyle = COL.moon; g.beginPath(); g.arc(128, 128, 18, 0, Math.PI * 2); g.fill(); }
+      else { g.fillStyle = COL.moon; g.beginPath(); g.arc(128, 128, 120, 0, Math.PI * 2); g.fill(); g.globalCompositeOperation = "destination-out"; g.beginPath(); g.arc(182, 112, 100, 0, Math.PI * 2); g.fill(); }
+      return c;
+    };
+    return { solid: mk(false), ghost: mk(true) };
+  })();
+  function buildMoon(cv) {
+    const ctx = cv.getContext("2d");
+    const N = parseInt(cv.dataset.n || "30", 10);
+    let W = 0, H = 0, dpr = 1, s = 1;
+    const bodies = []; let queue = 0, spawnT = 0, started = false;
+    function resize() {
+      const r = cv.getBoundingClientRect(); if (!r.width) return;
+      const oW = W || r.width; dpr = Math.min(2, window.devicePixelRatio || 1);
+      W = r.width; H = r.height; s = W / 560; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+      bodies.forEach((b) => { b.x *= W / oW; });
+    }
+    function spawn(y0) {
+      const r = rand(0.045, 0.085) * W * (N < 25 ? 1.5 : 1);
+      bodies.push({ x: rand(r, W - r), y: y0 !== undefined ? y0 : -r - rand(0, H * 0.2), vx: rand(-60, 60) * s, vy: rand(0, 120) * s, r, m: r * r, a: rand(0, 6.28), w: rand(-2, 2), ghost: Math.random() < 0.18 });
+    }
+    function step(dt) {
+      const sub = 3, h = dt / sub, G = 1500 * s, vmax = 2600 * s;
+      for (let k = 0; k < sub; k++) {
+        for (const b of bodies) {
+          b.vy += G * h; b.vx *= 0.9995;
+          b.vx = clamp(b.vx, -vmax, vmax); b.vy = clamp(b.vy, -vmax, vmax);
+          b.x += b.vx * h; b.y += b.vy * h; b.a += b.w * h; b.w *= 0.995;
+          if (b.x < b.r) { b.x = b.r; b.vx = Math.abs(b.vx) * 0.35; }
+          if (b.x > W - b.r) { b.x = W - b.r; b.vx = -Math.abs(b.vx) * 0.35; }
+          if (b.y > H - b.r) { b.y = H - b.r; if (b.vy > 0) b.vy = -b.vy * 0.22; b.vx *= 0.94; b.w = b.w * 0.8 + (b.vx / b.r) * 0.2; }
+        }
+        for (let it = 0; it < 2; it++) for (let i = 0; i < bodies.length; i++) {
+          const A = bodies[i];
+          for (let j = i + 1; j < bodies.length; j++) {
+            const B = bodies[j]; const dx = B.x - A.x, dy = B.y - A.y, rr = A.r + B.r;
+            if (Math.abs(dx) > rr || Math.abs(dy) > rr) continue;
+            const d2 = dx * dx + dy * dy; if (d2 >= rr * rr || d2 === 0) continue;
+            const d = Math.sqrt(d2), nx = dx / d, ny = dy / d, ov = rr - d;
+            const ia = 1 / A.m, ib = 1 / B.m, sum = ia + ib;
+            A.x -= nx * ov * (ia / sum) * 0.8; A.y -= ny * ov * (ia / sum) * 0.8;
+            B.x += nx * ov * (ib / sum) * 0.8; B.y += ny * ov * (ib / sum) * 0.8;
+            const rvx = B.vx - A.vx, rvy = B.vy - A.vy, vn = rvx * nx + rvy * ny;
+            if (vn < 0) {
+              const jn = -(1.25) * vn / sum;
+              A.vx -= jn * nx * ia; A.vy -= jn * ny * ia; B.vx += jn * nx * ib; B.vy += jn * ny * ib;
+              const tx = -ny, ty = nx, vt = rvx * tx + rvy * ty;
+              const jt = -vt / sum * 0.12;
+              A.vx -= jt * tx * ia; A.vy -= jt * ty * ia; B.vx += jt * tx * ib; B.vy += jt * ty * ib;
+              A.w -= vt / A.r * 0.05; B.w += vt / B.r * 0.05;
+            }
+          }
+        }
+      }
+    }
+    function draw() {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+      for (const b of bodies) {
+        ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(b.a);
+        ctx.drawImage(b.ghost ? moonSprites.ghost : moonSprites.solid, -b.r, -b.r, b.r * 2, b.r * 2);
+        ctx.restore();
+      }
+    }
+    const hv = hoverTracker(cv);
+    function start() { if (started || reduce) return; started = true; resize(); queue = N; }
+    cv.__blast = (cx, cy) => {
+      for (const b of bodies) {
+        const dx = b.x - cx, dy = b.y - cy, d = Math.hypot(dx, dy) || 1;
+        const f = Math.max(0, 1 - d / (W * 0.9)) * 1700 * s;
+        b.vx += dx / d * f; b.vy += dy / d * f - 500 * s; b.w += rand(-12, 12);
+      }
+    };
+    window.addEventListener("resize", () => { if (started) resize(); else if (reduce && bodies.length) { resize(); draw(); } });
+    register({
+      el: cv,
+      onShow() { if (cv.dataset.wait !== "flash") start(); },
+      tick(t, dt) {
+        if (!started) return;
+        if (!W) resize();
+        if (queue > 0) { spawnT += dt; while (spawnT > 0.055 && queue > 0) { spawnT -= 0.055; queue--; spawn(); } }
+        if (hv.on && (hv.vx || hv.vy)) {
+          for (const b of bodies) {
+            const d = Math.hypot(b.x - hv.px, b.y - hv.py);
+            if (d < b.r + 70 * s) { b.vx += hv.vx * 22; b.vy += hv.vy * 22 - 40 * s; b.w += hv.vx * 0.05; }
+          }
+          hv.vx = hv.vy = 0;
+        }
+        if (Math.abs(scrollVel) > 1.5) for (const b of bodies) { b.vy -= Math.min(Math.abs(scrollVel) * 9, 260) * s * Math.random() * dt * 60 * 0.15; b.vx += rand(-1, 1) * Math.abs(scrollVel) * 2 * s; }
+        step(dt); draw();
+      },
+      renderStatic() {
+        resize(); for (let i = 0; i < N; i++) spawn(rand(-H, H * 0.6));
+        for (let i = 0; i < 700; i++) step(1 / 60); draw();
+      }
+    });
+    cv.__start = start;
+  }
+
+  /* ---------- particle burst & re-assemble overlay ---------- */
+  const bc = document.getElementById("burst-canvas"); const bctx = bc.getContext("2d");
+  let bdpr = 1;
+  function sizeBurst() { bdpr = Math.min(2, window.devicePixelRatio || 1); bc.width = innerWidth * bdpr; bc.height = innerHeight * bdpr; }
+  sizeBurst(); window.addEventListener("resize", sizeBurst);
+  const tideBands = tideLayout(42, 14, 3.4);
+  const SHAPES = {
+    tide: (x, y) => (x - 50) ** 2 + (y - 50) ** 2 < 42 * 42 && tideBands.some(([b, h]) => y >= b && y <= b + h),
+    moon: (x, y) => (x - 50) ** 2 + (y - 50) ** 2 < 46 * 46 && (x - 70) ** 2 + (y - 44) ** 2 > 39 * 39,
+    wind: (x) => (x % (100 / 12)) < (100 / 12) - 0.9,
+    echo: (x, y) => { const d = Math.hypot(x - 50, y - 50); return [9, 16, 23, 30, 37, 44].some((r) => Math.abs(d - r) < 1.3); }
+  };
+  const sampleCache = {};
+  function samples(shape) {
+    if (sampleCache[shape]) return sampleCache[shape];
+    const pts = []; for (let y = 1; y < 100; y += 2) for (let x = 1; x < 100; x += 2) if (SHAPES[shape](x, y)) pts.push([x, y]);
+    return (sampleCache[shape] = pts);
+  }
+  const bursts = [];
+  function boxOf(b) {
+    if (b.fixed) return { x: b.fixed.x - scrollX, y: b.fixed.y - scrollY, w: b.fixed.w, h: b.fixed.h };
+    const r = b.el.getBoundingClientRect();
+    if (b.fill) return { x: r.left, y: r.top, w: r.width, h: r.height };
+    const sz = Math.min(r.width, r.height); return { x: r.left + (r.width - sz) / 2, y: r.top + (r.height - sz) / 2, w: sz, h: sz };
+  }
+  function burst(el, shape, cx, cy, opts) {
+    opts = opts || {};
+    const b = { el, shape, t: 0, color: COL[shape], fill: shape === "wind", fixed: opts.fixed, hide: !opts.fixed, clipEl: opts.clipEl, parts: [] };
+    const box = boxOf(b);
+    b.ps = Math.max(1.6, (box.w * 2) / 100 * 0.9);
+    for (const [u, v] of samples(shape)) {
+      const hx = box.x + u / 100 * box.w, hy = box.y + v / 100 * box.h;
+      let dx = hx - cx, dy = hy - cy; const d = Math.hypot(dx, dy) || 1; dx /= d; dy /= d;
+      const sp = rand(260, 980), a = rand(-0.5, 0.5), ca = Math.cos(a), sa = Math.sin(a);
+      b.parts.push({ u, v, x: hx + scrollX, y: hy + scrollY, vx: (dx * ca - dy * sa) * sp, vy: (dx * sa + dy * ca) * sp });
+    }
+    if (b.hide) el.style.visibility = "hidden";
+    bursts.push(b);
+  }
+  function tickBursts(dt) {
+    bctx.setTransform(bdpr, 0, 0, bdpr, 0, 0); bctx.clearRect(0, 0, innerWidth, innerHeight);
+    for (let k = bursts.length - 1; k >= 0; k--) {
+      const b = bursts[k]; b.t += dt; const box = boxOf(b); let maxD = 0;
+      const attract = b.t > 0.7, kk = attract ? Math.min(1, (b.t - 0.7) / 0.5) : 0;
+      for (const p of b.parts) {
+        if (!attract) { const dr = Math.pow(0.03, dt); p.vx *= dr; p.vy *= dr; p.vy += 90 * dt; p.vx += rand(-40, 40) * dt; }
+        else {
+          const hx = box.x + p.u / 100 * box.w + scrollX, hy = box.y + p.v / 100 * box.h + scrollY;
+          const ax = (hx - p.x) * (20 + 140 * kk) - p.vx * (6 + 12 * kk), ay = (hy - p.y) * (20 + 140 * kk) - p.vy * (6 + 12 * kk);
+          p.vx += ax * dt; p.vy += ay * dt; maxD = Math.max(maxD, Math.abs(hx - p.x) + Math.abs(hy - p.y));
+        }
+        p.x += p.vx * dt; p.y += p.vy * dt;
+      }
+      const done = (attract && b.t > 1.6 && maxD < 1.2) || b.t > 3.4;
+      let alpha = 1; if (b.fixed && b.t > 1.5) alpha = Math.max(0, 1 - (b.t - 1.5) / 0.5);
+      bctx.save(); bctx.globalAlpha = alpha; bctx.fillStyle = b.color;
+      if (b.clipEl && b.t > 0.9) { const r = b.clipEl.getBoundingClientRect(); bctx.beginPath(); bctx.rect(r.left, r.top, r.width, r.height); bctx.clip(); }
+      for (const p of b.parts) bctx.fillRect(p.x - scrollX - b.ps / 2, p.y - scrollY - b.ps / 2, b.ps, b.ps);
+      bctx.restore();
+      if (done || (b.fixed && b.t > 2.0)) { if (b.hide) b.el.style.visibility = ""; bursts.splice(k, 1); }
+    }
+  }
+  if (!reduce) {
+    document.addEventListener("click", (e) => {
+      const el = e.target.closest("[data-burst]"); if (!el) return;
+      e.preventDefault(); e.stopPropagation();
+      if (bursts.some((b) => b.el === el && !b.fixed)) return;
+      const shape = el.dataset.burst;
+      if (shape === "moon") {
+        const r = el.getBoundingClientRect();
+        if (el.__blast) el.__blast(e.clientX - r.left, e.clientY - r.top);
+        const sz = Math.min(r.width, r.height) * 0.42;
+        burst(el, "moon", e.clientX, e.clientY, { fixed: { x: e.clientX - sz / 2 + scrollX, y: e.clientY - sz / 2 + scrollY, w: sz, h: sz } });
+      } else {
+        burst(el, shape, e.clientX, e.clientY, { clipEl: el.closest(".collage-piece, .motif-stage, .thumb") });
+      }
+    }, true);
+  }
+
+  /* ---------- staccato flash-cut keywords on chapter entry ---------- */
+  const FLASH = {
+    tide: ["GRAVITY", "涨", "CYCLE", "退", "RETURN", "TIDE"],
+    moon: ["LIGHT", "明", "SHADOW", "暗", "PHASE", "MOON"],
+    wind: ["MOTION", "起", "FORCE", "落", "DRIFT", "WIND"],
+    echo: ["SOUND", "呼", "DISTANCE", "应", "VOICE", "ECHO"]
+  };
+  chapters.forEach((ch) => {
+    const id = ch.dataset.chapter, words = FLASH[id];
+    const fl = document.createElement("div"); fl.className = "flash"; fl.setAttribute("aria-hidden", "true");
+    fl.innerHTML = `<span class="fw"></span><div class="fmeta"><span><span class="dot"></span>${id.toUpperCase()} · No.${{ tide: "07", moon: "08", wind: "09", echo: "10" }[id]}</span><span class="cnt"></span></div>`;
+    ch.appendChild(fl);
+    const fw = fl.querySelector(".fw"), cnt = fl.querySelector(".cnt");
+    let done = false;
+    const finish = () => { const cv = ch.querySelector("canvas[data-wait='flash']"); if (cv && cv.__start) cv.__start(); };
+    function run() {
+      if (done) return; done = true;
+      if (reduce) { finish(); return; }
+      fl.classList.add("on"); let k = 0;
+      const show = () => {
+        const w = words[k]; fw.textContent = w; fw.classList.toggle("cn", /[^\x00-\x7F]/.test(w));
+        fw.style.fontSize = "100px";
+        const fs = Math.min(100 * fl.clientWidth * 0.92 / Math.max(1, fw.offsetWidth), 100 * fl.clientHeight * 0.62 / Math.max(1, fw.offsetHeight));
+        fw.style.fontSize = fs.toFixed(1) + "px";
+        cnt.textContent = String(k + 1).padStart(2, "0") + " / " + String(words.length).padStart(2, "0");
+        k++;
+        if (k < words.length) setTimeout(show, 150);
+        else setTimeout(() => { fl.classList.remove("on"); finish(); }, 420);
+      };
+      show();
+    }
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { io.disconnect(); run(); } }), { threshold: 0.5 });
+      io.observe(ch);
+    } else run();
+  });
+
+  /* ---------- matrix strips: tiny motifs sliding in a grid ---------- */
+  const KEYS = ["tide", "moon", "wind", "echo"];
+  function cellHTML() {
+    const k = KEYS[(Math.random() * 4) | 0], r = Math.random();
+    const cls = r < 0.12 ? "mc ink" : r < 0.2 ? "mc blank" : "mc";
+    return `<div class="${cls}"><svg viewBox="0 0 100 100"><use href="#mx-${k}"/></svg></div>`;
+  }
+  document.querySelectorAll("[data-matrix]").forEach((mx) => {
+    const cell = () => parseFloat(getComputedStyle(mx).getPropertyValue("--cell")) || 40;
+    const rows = [];
+    for (let r = 0; r < 3; r++) {
+      const row = document.createElement("div"); row.className = "mrow";
+      const cols = Math.ceil(Math.max(window.innerWidth, 1600) / cell()) + 3;
+      let h = ""; for (let c = 0; c < cols; c++) h += cellHTML(); row.innerHTML = h;
+      row.style.transform = `translateX(${-(cell() + 1)}px)`; mx.appendChild(row); rows.push(row);
+    }
+    let next = 0.3, busy = new Set();
+    function shift(row, dir) {
+      if (busy.has(row)) return; busy.add(row); const c = cell() + 1;
+      row.style.transition = "transform 0.38s cubic-bezier(0.7,0,0.3,1)";
+      row.style.transform = `translateX(${-c + dir * c}px)`;
+      setTimeout(() => {
+        row.style.transition = "none";
+        if (dir > 0) row.prepend(row.lastElementChild); else row.append(row.firstElementChild);
+        row.style.transform = `translateX(${-c}px)`; busy.delete(row);
+      }, 400);
+    }
+    register({
+      el: mx,
+      tick(t) {
+        if (t < next) return; next = t + 0.36;
+        const ri = (Math.random() * 3) | 0; shift(rows[ri], ri % 2 ? 1 : -1);
+        const all = rows[(Math.random() * 3) | 0].children; const c = all[(Math.random() * all.length) | 0];
+        if (c) c.outerHTML = cellHTML();
+      },
+      renderStatic() {}
+    });
+  });
+
+  /* ---------- build kinetic motifs ---------- */
+  document.querySelectorAll("[data-kin]").forEach((el) => {
+    const k = el.dataset.kin;
+    try {
+      if (k === "tide") buildTide(el);
+      else if (k === "echo") buildEcho(el);
+      else if (k === "wind") buildWind(el);
+      else if (k === "moon") buildMoon(el);
+    } catch (err) { console.error("kin", k, err); }
+  });
+
+  /* ---------- single rAF loop ---------- */
+  if (!reduce) {
+    let t0 = performance.now(), last = t0;
+    const loop = (now) => {
+      const dt = Math.min(1 / 30, (now - last) / 1000); last = now; const t = (now - t0) / 1000;
+      scrollVel = scrollVel * 0.82 + scrollDelta * 0.18; scrollDelta = 0;
+      for (const m of mods) if (m.visible) m.tick(t, dt);
+      if (bursts.length || bc.__dirty) { const had = bursts.length; tickBursts(dt); bc.__dirty = had > 0; }
+      requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
+  }
+})();
+
+</script>
+</body>
+</html>
