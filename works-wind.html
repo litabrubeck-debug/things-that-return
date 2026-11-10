@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>WIND 风向 · Works 展品 — 会回来的事物 Things That Return</title>
+<meta name="description" content="Three works for WIND 风向 (No.09): a graphic print, a real-time motion piece and an installation. Things That Return, West Bund Art Center." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@900&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #EFECE4;
+    --ink: #111111;
+    --grey: #6B6B68;
+    --rule: rgba(17, 17, 17, 0.18);
+    --rule-strong: rgba(17, 17, 17, 0.32);
+    --tide: #FF3B1F;
+    --moon: #2B3BFF;
+    --wind: #12A150;
+    --echo: #F2A900;
+    --nav-h: 52px;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: Inter, "Noto Sans SC", system-ui, sans-serif;
+    font-weight: 400; line-height: 1.5;
+    -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  .progress { position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 120; pointer-events: none; }
+  .progress-bar { height: 100%; width: 0%; background: var(--ink); transition: background-color 0.35s; }
+  body[data-active="tide"] .progress-bar { background: var(--tide); }
+  body[data-active="moon"] .progress-bar { background: var(--moon); }
+  body[data-active="wind"] .progress-bar { background: var(--wind); }
+  body[data-active="echo"] .progress-bar { background: var(--echo); }
+  .chapter-rail {
+    position: fixed; right: clamp(10px, 2vw, 22px); top: 50%; transform: translateY(-50%);
+    z-index: 90; display: flex; flex-direction: column; gap: 10px; align-items: flex-end;
+  }
+  .chapter-rail a {
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; font-weight: 500;
+    letter-spacing: 0.08em; color: var(--grey); display: flex; align-items: center; gap: 8px;
+    transition: color 0.25s;
+  }
+  .chapter-rail a .n { opacity: 0.7; }
+  .chapter-rail a .dot {
+    width: 6px; height: 6px; border-radius: 50%; border: 1px solid var(--grey); background: transparent;
+  }
+  .chapter-rail a.active { color: var(--ink); }
+  .chapter-rail a.active .dot { background: var(--rail-accent, var(--ink)); border-color: var(--rail-accent, var(--ink)); }
+  .chapter-rail a[data-chapter="tide"].active { --rail-accent: var(--tide); }
+  .chapter-rail a[data-chapter="moon"].active { --rail-accent: var(--moon); }
+  .chapter-rail a[data-chapter="wind"].active { --rail-accent: var(--wind); }
+  .chapter-rail a[data-chapter="echo"].active { --rail-accent: var(--echo); }
+  .site-nav {
+    position: fixed; top: 2px; left: 0; right: 0; height: var(--nav-h); z-index: 100;
+    display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    padding: 0 clamp(16px, 3.5vw, 40px);
+    background: color-mix(in srgb, var(--bg) 90%, transparent);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.35s var(--ease), transform 0.4s var(--ease);
+  }
+  .site-nav.scrolled { border-bottom-color: var(--rule); }
+  .site-nav.hidden-enter { transform: translateY(-110%); pointer-events: none; }
+  .nav-brand { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+  .nav-brand .cn { font-family: "Noto Serif SC", serif; font-weight: 900; font-size: 14px; white-space: nowrap; }
+  .nav-brand .en {
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; font-weight: 500; color: var(--grey);
+    letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .nav-chapters { display: flex; align-items: center; gap: clamp(10px, 1.8vw, 24px); }
+  .nav-chapters a {
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; font-weight: 500;
+    letter-spacing: 0.1em; color: var(--grey); position: relative; padding: 6px 0; transition: color 0.25s;
+  }
+  .nav-chapters a:hover { color: var(--ink); }
+  .nav-chapters a.active { color: var(--ink); }
+  .nav-chapters a.active::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--accent, var(--ink));
+  }
+  .nav-chapters a[data-chapter="tide"].active { --accent: var(--tide); }
+  .nav-chapters a[data-chapter="moon"].active { --accent: var(--moon); }
+  .nav-chapters a[data-chapter="wind"].active { --accent: var(--wind); }
+  .nav-chapters a[data-chapter="echo"].active { --accent: var(--echo); }
+  .nav-visit {
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; font-weight: 500;
+    letter-spacing: 0.08em; border-bottom: 1px solid var(--ink); padding-bottom: 2px; flex-shrink: 0;
+  }
+  .nav-visit:hover { opacity: 0.55; }
+  /* ===== v5 works / 展品 ===== */
+  .works { margin-top: 0; }
+  .works-head {
+    display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: baseline;
+    padding-bottom: 12px; border-bottom: 1px solid var(--rule-strong); margin-bottom: 8px;
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .works-head h3 { font-family: "Archivo Black", sans-serif; font-size: 22px; letter-spacing: -0.02em; text-transform: none; font-weight: 400; }
+  .works-head h3 .cn { font-family: "Noto Serif SC", serif; font-weight: 900; font-size: 18px; margin-left: 8px; }
+  .works-head .mid { color: var(--grey); }
+  .works-head .right { color: var(--grey); }
+  .works-grid { display: flex; flex-direction: column; gap: 0; }
+  .work {
+    min-width: 0; display: grid; align-items: center;
+    grid-template-columns: minmax(240px, 520px) minmax(0, 1fr);
+    grid-template-areas: "frame cap";
+    gap: clamp(28px, 4.5vw, 72px);
+    padding: clamp(36px, 5vw, 64px) 0;
+  }
+  .work + .work { border-top: 1px solid var(--rule); }
+  .work:nth-child(even) {
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 520px);
+    grid-template-areas: "cap frame";
+  }
+  .work.install {
+    grid-template-columns: minmax(0, 700px) minmax(280px, 1fr);
+  }
+  .work.install:nth-child(even) {
+    grid-template-columns: minmax(280px, 1fr) minmax(0, 700px);
+  }
+  .work-frame {
+    grid-area: frame; position: relative; overflow: hidden; width: 100%; min-width: 0;
+    border: 1px solid var(--rule-strong);
+    background: color-mix(in srgb, var(--bg) 94%, var(--ch-accent));
+    aspect-ratio: 3 / 4;
+  }
+  .work.install .work-frame {
+    aspect-ratio: 4 / 3; background: #ddd;
+  }
+  .work-frame > svg, .work-frame > canvas, .work-frame > img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .work-frame > img { object-fit: cover; object-position: center center; }
+  .work-frame canvas { cursor: crosshair; touch-action: pan-y; }
+  .work-tag {
+    position: absolute; top: 10px; left: 12px; z-index: 2; pointer-events: none;
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    background: var(--ink); color: var(--bg); padding: 3px 6px;
+  }
+  .work-hint {
+    position: absolute; bottom: 10px; left: 12px; right: 12px; z-index: 2; pointer-events: none;
+    display: flex; justify-content: space-between; gap: 8px;
+    font-family: "IBM Plex Mono", monospace; font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--grey);
+  }
+  .work-hint span { background: color-mix(in srgb, var(--bg) 88%, transparent); padding: 2px 4px; }
+  .work-cap { grid-area: cap; padding-top: 0; max-width: 38em; justify-self: start; width: 100%; }
+  .work:nth-child(even) .work-cap { justify-self: end; }
+  .work-cap .no {
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--grey); display: flex; justify-content: space-between; gap: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--rule);
+  }
+  .work-cap .no b { color: var(--ink); font-weight: 500; }
+  .work-cap .no b::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--ch-accent); margin-right: 6px; vertical-align: 0; }
+  .work-cap .t { margin-top: 10px; font-size: 17px; font-weight: 600; line-height: 1.25; letter-spacing: -0.01em; }
+  .work-cap .t .cn { font-family: "Noto Serif SC", serif; font-weight: 900; font-size: 15px; margin-left: 6px; }
+  .work-cap .m { margin-top: 4px; font-family: "IBM Plex Mono", monospace; font-size: 10.5px; line-height: 1.5; color: var(--grey); letter-spacing: 0.02em; }
+  .work-cap .d { margin-top: 8px; font-size: 13px; line-height: 1.55; color: #3a3a38; max-width: 46ch; text-wrap: pretty; }
+  .work-cap .d-cn { margin-top: 4px; font-family: "Noto Sans SC", sans-serif; font-size: 12px; line-height: 1.65; color: var(--grey); max-width: 40em; text-wrap: pretty; }
+  @media (max-width: 980px) {
+    .works-head { grid-template-columns: 1fr auto; }
+    .works-head .mid { display: none; }
+    .work, .work:nth-child(even), .work.install {
+      grid-template-columns: 1fr;
+      grid-template-areas: "frame" "cap";
+      gap: 18px; align-items: start;
+      padding: 32px 0;
+    }
+    .work-frame, .work.install .work-frame { width: 100%; }
+    .work.flat .work-frame, .work.motion .work-frame { aspect-ratio: 3 / 4; }
+    .work-cap, .work:nth-child(even) .work-cap { justify-self: stretch; max-width: none; }
+  }
+
+
+  body { min-height: 100vh; position: relative; }
+  body::before { content: ""; position: absolute; inset: 0; background: var(--ch-accent); opacity: 0.07; pointer-events: none; z-index: 0; }
+  body[data-theme="tide"] { --ch-accent: var(--tide); }
+  body[data-theme="moon"] { --ch-accent: var(--moon); }
+  body[data-theme="wind"] { --ch-accent: var(--wind); }
+  body[data-theme="echo"] { --ch-accent: var(--echo); }
+  .progress-bar { background: var(--ch-accent); }
+  .wp { position: relative; z-index: 1; width: min(1280px, calc(100% - clamp(32px, 6vw, 80px))); margin-inline: auto; padding: calc(var(--nav-h) + 28px) 0 0; }
+  .wp-back {
+    display: inline-flex; align-items: center; gap: 10px; margin-bottom: 22px;
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+    border-bottom: 1px solid var(--ink); padding-bottom: 3px;
+  }
+  .wp-back .arr { transition: transform 0.3s var(--ease); display: inline-block; }
+  .wp-back:hover .arr { transform: translateX(-4px); }
+  .wp-top {
+    display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center;
+    padding-bottom: 14px; border-bottom: 1px solid var(--rule-strong);
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .wp-top .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ch-accent); display: inline-block; margin-right: 8px; vertical-align: middle; }
+  .wp-top .mid { color: var(--grey); text-align: center; }
+  .wp-top .right { color: var(--grey); }
+  .wp-head { display: grid; grid-template-columns: auto 1fr; gap: clamp(20px, 3vw, 40px); align-items: end; padding: 26px 0 28px; border-bottom: 1px solid var(--rule-strong); }
+  .wp-title { font-family: "Archivo Black", sans-serif; font-size: clamp(72px, 12vw, 168px); line-height: 0.82; letter-spacing: -0.05em; }
+  .wp-title .acc { color: var(--ch-accent); }
+  .wp-sub { padding-bottom: 6px; }
+  .wp-sub .cn { font-family: "Noto Serif SC", serif; font-weight: 900; font-size: clamp(28px, 3vw, 40px); line-height: 1.1; }
+  .wp-sub .py { font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: 0.18em; color: var(--grey); margin: 6px 0 12px; }
+  .wp-sub .en { font-size: 15px; font-weight: 500; max-width: 42ch; }
+  .wp-sub .zh { font-family: "Noto Sans SC", sans-serif; font-size: 13px; color: var(--grey); line-height: 1.7; margin-top: 2px; }
+  .wp-sub .lbl { margin-top: 14px; font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey); }
+  .wp-pager { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--rule-strong); border-bottom: 1px solid var(--rule-strong); margin-top: 8px; }
+  .wp-pager a { display: block; padding: 22px 0 24px; position: relative; }
+  .wp-pager a + a { border-left: 1px solid var(--rule); padding-left: 24px; text-align: right; }
+  .wp-pager .k { font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--grey); }
+  .wp-pager .w { display: block; margin-top: 6px; font-family: "Archivo Black", sans-serif; font-size: clamp(28px, 4vw, 52px); line-height: 0.95; letter-spacing: -0.03em; transition: color 0.25s; }
+  .wp-pager .w .cn { font-family: "Noto Serif SC", serif; font-weight: 900; font-size: 0.42em; letter-spacing: 0; margin-left: 8px; vertical-align: 0.35em; }
+  .wp-pager a[data-ch="tide"]:hover .w { color: var(--tide); }
+  .wp-pager a[data-ch="moon"]:hover .w { color: var(--moon); }
+  .wp-pager a[data-ch="wind"]:hover .w { color: var(--wind); }
+  .wp-pager a[data-ch="echo"]:hover .w { color: var(--echo); }
+  .wp-foot {
+    display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 22px 0 40px;
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--grey);
+  }
+  .wp-foot a { color: var(--ink); border-bottom: 1px solid var(--ink); }
+  .strip { position: relative; z-index: 1; height: 56px; background: var(--ink); color: var(--bg); display: flex; align-items: center; overflow: hidden; }
+  .strip .track { display: inline-flex; white-space: nowrap; font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; animation: wpScroll 38s linear infinite; }
+  .strip .track span { padding: 0 24px; }
+  @keyframes wpScroll { to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) { .strip .track { animation: none; } html { scroll-behavior: auto; } }
+  @media (max-width: 980px) {
+    .nav-brand .en { display: none; }
+    .wp-head { grid-template-columns: 1fr; align-items: start; gap: 14px; }
+    .wp-top { grid-template-columns: 1fr auto; }
+    .wp-top .mid { display: none; }
+  }
+  @media (max-width: 560px) {
+    .nav-chapters { gap: 10px; }
+    .nav-chapters a { font-size: 10px; letter-spacing: 0.06em; }
+    .nav-visit { display: none; }
+    .wp-pager a + a { padding-left: 14px; }
+  }
+</style>
+</head>
+<body data-theme="wind">
+<div class="progress" aria-hidden="true"><div class="progress-bar" id="progress-bar"></div></div>
+<header class="site-nav" id="site-nav">
+  <a class="nav-brand" href="index.html">
+    <span class="cn">会回来的事物</span>
+    <span class="en">Things That Return</span>
+  </a>
+  <nav class="nav-chapters" aria-label="Works by theme">
+    <a href="works-tide.html" data-chapter="tide">TIDE</a>
+    <a href="works-moon.html" data-chapter="moon">MOON</a>
+    <a href="works-wind.html" data-chapter="wind" class="active" aria-current="page">WIND</a>
+    <a href="works-echo.html" data-chapter="echo">ECHO</a>
+  </nav>
+  <a class="nav-visit" href="index.html#visit">Visit / 参观</a>
+</header>
+
+<main class="wp" id="works-wind-page">
+  <a class="wp-back" href="index.html#chapter-wind"><span class="arr" aria-hidden="true">←</span>Back to WIND · 返回风向</a>
+  <div class="wp-top">
+    <div><span class="dot"></span>No.09 · Works 展品</div>
+    <div class="mid">Vertical force · Accent #12A150 · Graphic / Motion / Installation</div>
+    <div class="right">No.09-A — C</div>
+  </div>
+  <header class="wp-head">
+    <h1 class="wp-title">WIND<span class="acc">.</span></h1>
+    <div class="wp-sub">
+      <p class="cn">风向 · 展品</p>
+      <p class="py">FĒNG XIÀNG</p>
+      <p class="en">Motion, direction, and what we cannot see but feel.</p>
+      <p class="zh">关于运动、方向，以及看不见却感受得到的事物。</p>
+      <p class="lbl">3 works · Graphic 平面 / Motion 动态 / Installation 装置</p>
+    </div>
+  </header>
+
+  <section class="works" id="works-wind" aria-label="Works · 风向展品">
+<div class="works-grid">
+          <figure class="work flat">
+            <div class="work-frame"><span class="work-tag">09-A</span><svg viewBox="0 0 300 400" data-work-svg="wind" role="img" aria-label="Beaufort 0—12 — 蒲福风级"></svg></div>
+            <figcaption class="work-cap">
+              <div class="no"><b>No.09-A</b><span>Graphic</span></div>
+              <p class="t">Beaufort 0—12<span class="cn">蒲福风级</span></p>
+              <p class="m">2026 · Digital print on cotton rag, 120 × 160 cm</p>
+              <p class="d">Thirteen hanging strips, one for each force on the Beaufort scale, from flat calm to hurricane.</p>
+              <p class="d-cn">十三条垂挂的色带，对应蒲福风级 0 至 12 级，从无风到飓风。</p>
+            </figcaption>
+          </figure>
+          <figure class="work motion">
+            <div class="work-frame"><span class="work-tag">09-B</span><canvas data-work-motion="wind" aria-label="Flow Field — 流场, interactive"></canvas><div class="work-hint"><span>Move cursor · Push the wind</span><span>Live</span></div></div>
+            <figcaption class="work-cap">
+              <div class="no"><b>No.09-B</b><span>Motion</span></div>
+              <p class="t">Flow Field<span class="cn">流场</span></p>
+              <p class="m">2026 · Generative, real-time · browser, variable size</p>
+              <p class="d">Particles drift along an invisible wind. Move your cursor through them to push them aside, and the current slowly closes behind you.</p>
+              <p class="d-cn">粒子沿着看不见的风流动。用光标拨开它们，气流会在身后慢慢合拢。</p>
+            </figcaption>
+          </figure>
+          <figure class="work install">
+            <div class="work-frame"><span class="work-tag">09-C</span><img src="works/wind-installation.jpg" alt="Twelve Breaths — installation render: Twelve green curtains hang from a single rail. Fans on staggered timers lift them one after another, so the wall seems to breathe." loading="lazy" decoding="async" width="1152" height="864" /></div>
+            <figcaption class="work-cap">
+              <div class="no"><b>No.09-C</b><span>Installation</span></div>
+              <p class="t">Twelve Breaths<span class="cn">十二次呼吸</span></p>
+              <p class="m">2026 · Polyester voile, aluminium ceiling track, timed floor fans, 1200 × 480 cm</p>
+              <p class="d">Twelve green curtains hang from a single rail. Fans on staggered timers lift them one after another, so the wall seems to breathe.</p>
+              <p class="d-cn">十二幅绿色纱帘挂在同一条轨道上。错开定时的风扇依次吹起它们，整面墙像在呼吸。</p>
+            </figcaption>
+          </figure>
+        </div>
+  </section>
+
+  <nav class="wp-pager" aria-label="Other themes">
+    <a href="works-moon.html" data-ch="moon" rel="prev"><span class="k">← Previous · No.08</span><span class="w">MOON<span class="cn">月相</span></span></a>
+    <a href="works-echo.html" data-ch="echo" rel="next"><span class="k">Next · No.10 →</span><span class="w">ECHO<span class="cn">回声</span></span></a>
+  </nav>
+  <div class="wp-foot"><span>会回来的事物 · Things That Return · 2026</span><a href="index.html#chapter-wind">← Back to WIND 返回风向</a></div>
+</main>
+<div class="strip" aria-hidden="true"><div class="track"><span>WIND 风向</span><span>No.09</span><span>Works · 展品</span><span>Vertical force · Accent #12A150</span><span>West Bund Art Center</span><span>2027.03.05 — 04.04</span><span>WIND 风向</span><span>No.09</span><span>Works · 展品</span><span>Vertical force · Accent #12A150</span><span>West Bund Art Center</span><span>2027.03.05 — 04.04</span><span>WIND 风向</span><span>No.09</span><span>Works · 展品</span><span>Vertical force · Accent #12A150</span><span>West Bund Art Center</span><span>2027.03.05 — 04.04</span><span>WIND 风向</span><span>No.09</span><span>Works · 展品</span><span>Vertical force · Accent #12A150</span><span>West Bund Art Center</span><span>2027.03.05 — 04.04</span></div></div>
+
+<script>
+(() => {
+  const nav = document.getElementById("site-nav"), bar = document.getElementById("progress-bar");
+  const on = () => {
+    const h = document.documentElement.scrollHeight - innerHeight;
+    bar.style.width = (h > 0 ? (scrollY / h) * 100 : 0) + "%";
+    nav.classList.toggle("scrolled", scrollY > 8);
+  };
+  addEventListener("scroll", on, { passive: true }); on();
+})();
+</script>
+<script>
+
+/* ===== v5 works / 展品 — graphic SVGs + motion canvases ===== */
+(() => {
+  "use strict";
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const C = { tide: "#FF3B1F", moon: "#2B3BFF", wind: "#12A150", echo: "#F2A900", ink: "#111111", bg: "#EFECE4", grey: "#6B6B68" };
+  const MONO = "'IBM Plex Mono', monospace", DISP = "'Archivo Black', sans-serif", SERIF = "'Noto Serif SC', serif";
+  const f = (n) => n.toFixed(2);
+  const txt = (x, y, s, o = {}) => `<text x="${x}" y="${y}" font-family="${o.ff || MONO}" font-size="${o.fs || 8}" fill="${o.fill || C.ink}" ${o.anchor ? `text-anchor="${o.anchor}"` : ""} ${o.ls ? `letter-spacing="${o.ls}"` : ""} ${o.w ? `font-weight="${o.w}"` : ""}>${s}</text>`;
+  const frameTxt = (code, right, foot, footCn) =>
+    txt(280, 28, right, { anchor: "end", ls: 1, fill: C.grey }) +
+    `<line x1="20" y1="36" x2="280" y2="36" stroke="${C.ink}" stroke-opacity=".3" stroke-width=".6"/>` +
+    `<line x1="20" y1="362" x2="280" y2="362" stroke="${C.ink}" stroke-opacity=".3" stroke-width=".6"/>` +
+    txt(20, 382, foot, { ff: DISP, fs: 15, ls: -0.3 }) + txt(280, 381, footCn, { ff: SERIF, fs: 12, anchor: "end", w: 900 });
+
+  /* circle band: part of a circle (cx,cy,r) between y0..y1 (relative to cy), shifted dx */
+  function band(cx, cy, r, y0, y1, dx) {
+    const N = 6, L = [], R = [];
+    for (let i = 0; i <= N; i++) {
+      const y = y0 + (y1 - y0) * i / N, w = Math.sqrt(Math.max(0, r * r - y * y));
+      L.push([cx + dx - w, cy + y]); R.push([cx + dx + w, cy + y]);
+    }
+    const pts = L.concat(R.reverse());
+    return "M" + pts.map((p) => f(p[0]) + "," + f(p[1])).join("L") + "Z";
+  }
+  /* moon phase path, p in [0,1): 0 new, .5 full */
+  function phasePath(cx, cy, r, p) {
+    const k = Math.cos(2 * Math.PI * p), rx = Math.abs(k) * r, wax = p < 0.5;
+    const so = wax ? 1 : 0, si = wax ? (k > 0 ? 0 : 1) : (k > 0 ? 1 : 0);
+    return `M${f(cx)},${f(cy - r)}A${f(r)},${f(r)} 0 0 ${so} ${f(cx)},${f(cy + r)}A${f(rx)},${f(r)} 0 0 ${si} ${f(cx)},${f(cy - r)}Z`;
+  }
+
+  const GRAPHIC = {
+    tide() {
+      let g = "";
+      const cols = 4, rows = 7, x0 = 20, cw = 65, y0 = 44, rh = 45.4, r = 18.5, nb = 6;
+      for (let d = 0; d < 28; d++) {
+        const c = d % cols, ro = Math.floor(d / cols);
+        const cx = x0 + cw * c + cw / 2, cy = y0 + rh * ro + rh / 2;
+        const A = (1 + Math.cos(4 * Math.PI * d / 29.53)) / 2; // spring tides near new/full moon
+        const gap = 0.6 + 1.6 * A;
+        const bh = (2 * r - gap * (nb - 1)) / nb;
+        for (let b = 0; b < nb; b++) {
+          const ya = -r + b * (bh + gap), yb = ya + bh;
+          const dx = (b % 2 ? 1 : -1) * A * (2 + 7 * b / (nb - 1));
+          g += `<path d="${band(cx, cy, r, ya, yb, dx)}" fill="${C.tide}"/>`;
+        }
+        g += txt(cx - cw / 2 + 4, cy - rh / 2 + 8, String(d + 1).padStart(2, "0"), { fs: 5.5, fill: C.grey });
+      }
+      return frameTxt("No.07-A", "SPRING / NEAP · 28 DAYS", "TIDE", "大潮与小潮") + g;
+    },
+    moon() {
+      const cx = 150, cy = 199, R = 118, r = 11.5;
+      let g = `<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${C.ink}" stroke-opacity=".22" stroke-width=".6" stroke-dasharray="1.5 3"/>`;
+      for (let i = 0; i < 29; i++) {
+        const p = i / 29.53, a = -Math.PI / 2 + 2 * Math.PI * i / 29;
+        const x = cx + R * Math.cos(a), y = cy + R * Math.sin(a);
+        g += `<circle cx="${f(x)}" cy="${f(y)}" r="${r}" fill="${C.bg}" stroke="${C.ink}" stroke-opacity=".35" stroke-width=".6"/>`;
+        if (i) g += `<path d="${phasePath(x, y, r, p)}" fill="${C.moon}"/>`;
+        const lx = cx + (R - 24) * Math.cos(a), ly = cy + (R - 24) * Math.sin(a) + 2;
+        g += txt(f(lx), f(ly), String(i + 1), { fs: 5.5, fill: C.grey, anchor: "middle" });
+      }
+      g += txt(cx, cy + 8, "29.53", { ff: DISP, fs: 40, fill: C.moon, anchor: "middle", ls: -1.5 });
+      g += txt(cx, cy + 24, "DAYS · NEW → NEW", { fs: 6.5, fill: C.grey, anchor: "middle", ls: 1 });
+      return frameTxt("No.08-A", "SYNODIC MONTH · 29 PHASES", "MOON", "朔望月") + g;
+    },
+    wind() {
+      let g = `<line x1="20" y1="58" x2="280" y2="58" stroke="${C.ink}" stroke-width="2"/>`;
+      const n = 13, x0 = 22, step = 16.2, w = 9, top = 58, H = 270;
+      for (let i = 0; i < n; i++) {
+        const x = x0 + i * step, dx = 1.05 * Math.pow(i, 1.55);
+        const by = top + Math.sqrt(Math.max(0, H * H - dx * dx * 0.9));
+        const c1y = top + H * 0.45, c2y = top + H * 0.8;
+        const d = `M${f(x)},${top}C${f(x)},${f(c1y)} ${f(x + dx * 0.25)},${f(c2y)} ${f(x + dx)},${f(by)}L${f(x + dx + w)},${f(by - dx * 0.04)}C${f(x + w + dx * 0.25)},${f(c2y)} ${f(x + w)},${f(c1y)} ${f(x + w)},${top}Z`;
+        g += `<path d="${d}" fill="${C.wind}" fill-opacity="${f(0.55 + 0.45 * i / 12)}"/>`;
+        g += `<circle cx="${f(x + w / 2)}" cy="${top}" r="1.6" fill="${C.ink}"/>`;
+        g += txt(f(x + w / 2), 350, String(i), { fs: 7, anchor: "middle", fill: i === 0 || i === 12 ? C.ink : C.grey });
+      }
+      g += txt(20, 50, "CALM", { fs: 6, fill: C.grey, ls: 1 }) + txt(280, 50, "HURRICANE", { fs: 6, fill: C.grey, ls: 1, anchor: "end" });
+      return frameTxt("No.09-A", "BEAUFORT SCALE · FORCE 0—12", "WIND", "蒲福风级") + g;
+    },
+    echo() {
+      const id = "ecw" + Math.random().toString(36).slice(2, 7);
+      let a = "", b = "";
+      for (let r = 6; r < 300; r += 9) {
+        a += `<circle cx="112" cy="168" r="${r}" fill="none" stroke="${C.echo}" stroke-width="3.6"/>`;
+        b += `<circle cx="196" cy="252" r="${r}" fill="none" stroke="${C.ink}" stroke-width="1.4"/>`;
+      }
+      const g = `<defs><clipPath id="${id}"><rect x="20" y="44" width="260" height="310"/></clipPath></defs><g clip-path="url(#${id})">${a}<g opacity=".82">${b}</g></g>` +
+        `<circle cx="112" cy="168" r="3" fill="${C.ink}"/><circle cx="196" cy="252" r="3" fill="${C.echo}" stroke="${C.ink}" stroke-width=".8"/>`;
+      return frameTxt("No.10-A", "TWO SOURCES · ONE FIELD", "ECHO", "干涉") + g;
+    }
+  };
+  document.querySelectorAll("svg[data-work-svg]").forEach((svg) => {
+    const fn = GRAPHIC[svg.dataset.workSvg]; if (fn) svg.innerHTML = fn();
+  });
+
+  /* ---------- motion works ---------- */
+  const works = [];
+  function setup(cv, init) {
+    const ctx = cv.getContext("2d");
+    const w = { cv, ctx, W: 0, H: 0, dpr: 1, visible: false, t: 0, m: { on: false, x: 0, y: 0, vx: 0, vy: 0 } };
+    const fit = () => {
+      const r = cv.getBoundingClientRect(); w.dpr = Math.min(2, window.devicePixelRatio || 1);
+      w.W = Math.max(1, r.width); w.H = Math.max(1, r.height);
+      cv.width = Math.round(w.W * w.dpr); cv.height = Math.round(w.H * w.dpr);
+      ctx.setTransform(w.dpr, 0, 0, w.dpr, 0, 0);
+      w.resize && w.resize(); w.draw(w.t, 0);
+    };
+    cv.addEventListener("pointermove", (e) => {
+      const r = cv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+      if (w.m.on) { w.m.vx = x - w.m.x; w.m.vy = y - w.m.y; }
+      w.m.x = x; w.m.y = y; w.m.on = true;
+    });
+    cv.addEventListener("pointerleave", () => { w.m.on = false; w.m.vx = w.m.vy = 0; });
+    init(w);
+    works.push(w);
+    if ("ResizeObserver" in window) new ResizeObserver(fit).observe(cv); else window.addEventListener("resize", fit);
+    fit();
+    return w;
+  }
+
+  const MOTION = {
+    tide(w) {
+      let level = 0.42, amp = 1;
+      w.draw = (t, dt) => {
+        const { ctx, W, H, m } = w;
+        const target = m.on ? Math.min(0.85, Math.max(0.12, m.y / H)) : 0.42 + 0.06 * Math.sin(t * 0.35);
+        level += (target - level) * Math.min(1, dt * 2.2);
+        amp += ((m.on ? 1.8 : 1) - amp) * Math.min(1, dt * 2);
+        ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = "rgba(255,59,31,0.06)"; ctx.fillRect(0, 0, W, H);
+        const sx = Math.max(10, W / 30), rows = 22, gap = Math.max(10, H / 34);
+        // moon disc that sinks as the water rises
+        const mr = W * 0.12, my = H * 0.08 + mr + (1 - level) * H * 0.05;
+        ctx.fillStyle = C.ink; ctx.beginPath(); ctx.arc(W * 0.72, my, mr * 0.55, 0, 7); ctx.fill();
+        for (let k = 0; k < rows; k++) {
+          const base = level * H + k * gap * (1 + k * 0.035);
+          if (base - 30 > H) break;
+          for (let x = sx / 2; x < W; x += sx) {
+            const near = m.on ? Math.exp(-Math.pow((x - m.x) / (W * 0.18), 2)) : 0;
+            const y = base + (6 + 10 * amp * (1 - k / rows)) * Math.sin(x * 0.018 + t * 1.3 - k * 0.45) + near * -18 * (1 - k / rows) * Math.sin(t * 3 - k * 0.6);
+            const rr = k === 0 ? 2.6 : Math.max(0.8, 2.2 - k * 0.06);
+            ctx.fillStyle = k === 0 ? C.ink : C.tide; ctx.globalAlpha = k === 0 ? 1 : Math.max(0.25, 1 - k * 0.035);
+            ctx.beginPath(); ctx.arc(x, y, rr, 0, 7); ctx.fill();
+          }
+        }
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = C.grey; ctx.font = `10px ${MONO}`; ctx.textAlign = "right";
+        ctx.fillText("LEVEL " + Math.round((1 - level) * 100).toString().padStart(2, "0"), W - 12, 22);
+      };
+    },
+    moon(w) {
+      let p = 0.1, hoverP = null;
+      const scrollP = () => {
+        const r = w.cv.getBoundingClientRect(), vh = window.innerHeight;
+        const prog = (vh - r.top) / (vh + r.height); // 0 → 1 as it passes through viewport
+        return ((Math.min(1, Math.max(0, prog)) * 1.0) % 1 + 1) % 1;
+      };
+      w.draw = (t, dt) => {
+        const { ctx, W, H, m } = w;
+        hoverP = m.on ? Math.min(0.999, Math.max(0, m.x / W)) : null;
+        const target = hoverP != null ? hoverP : scrollP();
+        p += (target - p) * Math.min(1, (dt || 1) * 6);
+        ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = "rgba(43,59,255,0.05)"; ctx.fillRect(0, 0, W, H);
+        const cx = W / 2, cy = H * 0.43, R = Math.min(W, H) * 0.33;
+        ctx.strokeStyle = "rgba(17,17,17,.3)"; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(cx, cy, R, 0, 7); ctx.stroke();
+        if (p > 0.004 && p < 0.996) { ctx.fillStyle = C.moon; ctx.fill(new Path2D(phasePath(cx, cy, R, p))); }
+        // day ticks
+        const ty = H * 0.82, x0 = W * 0.1, x1 = W * 0.9, day = Math.round(p * 29.53) % 30;
+        for (let i = 0; i < 30; i++) {
+          const x = x0 + (x1 - x0) * i / 29, on = i === day;
+          ctx.fillStyle = on ? C.moon : (i <= day ? C.ink : "rgba(17,17,17,.3)");
+          ctx.fillRect(x - (on ? 1.5 : 0.5), ty - (on ? 14 : i % 7 === 0 ? 9 : 5), on ? 3 : 1, on ? 14 : i % 7 === 0 ? 9 : 5);
+        }
+        ctx.font = `10px ${MONO}`; ctx.fillStyle = C.ink; ctx.textAlign = "left";
+        ctx.fillText("DAY " + String(day).padStart(2, "0") + " / 29.53", x0, ty + 18);
+        ctx.textAlign = "right"; ctx.fillStyle = C.grey;
+        const names = ["NEW", "WAXING CRESCENT", "FIRST QUARTER", "WAXING GIBBOUS", "FULL", "WANING GIBBOUS", "LAST QUARTER", "WANING CRESCENT"];
+        ctx.fillText(names[Math.round(p * 8) % 8], x1, ty + 18);
+      };
+    },
+    wind(w) {
+      let P = [];
+      const N = () => Math.round(Math.min(900, (w.W * w.H) / 160));
+      const seed = () => ({ x: Math.random() * w.W, y: Math.random() * w.H, vx: 0, vy: 0, life: 60 + Math.random() * 200, c: Math.random() < 0.12 });
+      w.resize = () => { P = Array.from({ length: N() }, seed); w.clear = true; };
+      const field = (x, y, t) => {
+        const s = 0.006;
+        return 0.35 * Math.PI * (Math.sin(x * s + t * 0.25) * Math.cos(y * s * 1.3 - t * 0.18) + 0.6 * Math.sin((x + y) * s * 0.7 + t * 0.1));
+      };
+      w.draw = (t, dt) => {
+        const { ctx, W, H, m } = w;
+        if (w.clear || !dt) { ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H); w.clear = false; }
+        ctx.fillStyle = "rgba(239,236,228,0.10)"; ctx.fillRect(0, 0, W, H);
+        const steps = dt ? 1 : 45;
+        for (let s = 0; s < steps; s++) {
+          if (s) { ctx.fillStyle = "rgba(239,236,228,0.07)"; ctx.fillRect(0, 0, W, H); }
+          for (const q of P) {
+            const a = field(q.x, q.y, t);
+            let ax = Math.cos(a) * 0.9 + 0.35, ay = Math.sin(a) * 0.9;
+            if (m.on) {
+              const dx = q.x - m.x, dy = q.y - m.y, d2 = dx * dx + dy * dy, R = 90;
+              if (d2 < R * R) { const d = Math.sqrt(d2) || 1, k = (1 - d / R) * 4; ax += dx / d * k + m.vx * 0.08; ay += dy / d * k + m.vy * 0.08; }
+            }
+            q.vx = q.vx * 0.86 + ax * 0.3; q.vy = q.vy * 0.86 + ay * 0.3;
+            const ox = q.x, oy = q.y; q.x += q.vx; q.y += q.vy; q.life--;
+            if (q.x > W + 4 || q.x < -4 || q.y > H + 4 || q.y < -4 || q.life < 0) { Object.assign(q, seed()); if (Math.random() < 0.7) q.x = -2; continue; }
+            ctx.strokeStyle = q.c ? C.ink : C.wind; ctx.lineWidth = q.c ? 1 : 1.4;
+            ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(q.x, q.y); ctx.stroke();
+          }
+        }
+        m.vx *= 0.8; m.vy *= 0.8;
+      };
+    },
+    echo(w) {
+      const em = []; let lastAuto = -9, lastUser = -9;
+      const add = (x, y, t) => { em.push({ x, y, t0: t }); if (em.length > 9) em.shift(); };
+      w.cv.addEventListener("pointerdown", (e) => {
+        const r = w.cv.getBoundingClientRect(); add(e.clientX - r.left, e.clientY - r.top, w.t); lastUser = w.t;
+        if (reduce) w.draw(w.t + 1.2, 0, true);
+      });
+      w.draw = (t, dt, manual) => {
+        const { ctx, W, H } = w;
+        if (!em.length && !manual) { add(W * 0.35, H * 0.38, t - 2.2); add(W * 0.66, H * 0.62, t - 1.1); }
+        if (dt && t - lastAuto > 2.6 && t - lastUser > 4) { add(W * (0.2 + Math.random() * 0.6), H * (0.2 + Math.random() * 0.6), t); lastAuto = t; }
+        ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = "rgba(242,169,0,0.06)"; ctx.fillRect(0, 0, W, H);
+        ctx.globalCompositeOperation = "multiply";
+        const sp = Math.min(W, H) * 0.16, maxAge = 6.5;
+        for (const e of em) {
+          const age = t - e.t0; if (age < 0 || age > maxAge) continue;
+          const fade = 1 - age / maxAge;
+          for (let j = 0; j < 7; j++) {
+            const r = age * sp - j * 14; if (r <= 0) continue;
+            ctx.strokeStyle = C.echo; ctx.globalAlpha = fade * (1 - j / 7); ctx.lineWidth = 5 - j * 0.5;
+            ctx.beginPath(); ctx.arc(e.x, e.y, r, 0, 7); ctx.stroke();
+          }
+          ctx.globalAlpha = Math.min(1, fade * 1.5); ctx.fillStyle = C.ink;
+          ctx.beginPath(); ctx.arc(e.x, e.y, 2.5, 0, 7); ctx.fill();
+        }
+        ctx.globalCompositeOperation = "source-over"; ctx.globalAlpha = 1;
+        while (em.length && t - em[0].t0 > maxAge) em.shift();
+        ctx.font = `10px ${MONO}`; ctx.fillStyle = C.grey; ctx.textAlign = "right";
+        ctx.fillText("SOURCES " + String(em.length).padStart(2, "0"), W - 12, 22);
+      };
+    }
+  };
+  document.querySelectorAll("canvas[data-work-motion]").forEach((cv) => {
+    const fn = MOTION[cv.dataset.workMotion]; if (fn) setup(cv, fn);
+  });
+  // static frame for reduced motion: render a representative moment
+  if (reduce) {
+    works.forEach((w) => { w.t = 2.4; w.draw(2.4, 0); });
+    window.addEventListener("scroll", () => works.forEach((w) => { if (w.cv.dataset.workMotion === "moon") w.draw(w.t, 0); }), { passive: true });
+    return;
+  }
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver((es) => es.forEach((e) => { const w = works.find((x) => x.cv === e.target); if (w) w.visible = e.isIntersecting; }), { rootMargin: "60px 0px" });
+    works.forEach((w) => io.observe(w.cv));
+  } else works.forEach((w) => (w.visible = true));
+  let last = performance.now();
+  const loop = (now) => {
+    const dt = Math.min(1 / 30, (now - last) / 1000); last = now;
+    for (const w of works) if (w.visible) { w.t += dt; w.draw(w.t, dt); }
+    requestAnimationFrame(loop);
+  };
+  requestAnimationFrame(loop);
+  window.__works = works;
+})();
+
+
+</script>
+</body>
+</html>
