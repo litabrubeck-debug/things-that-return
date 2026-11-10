@@ -535,6 +535,87 @@
     .mega-ghost { display: none; }
   }
 
+
+  /* ===== v5 works / 展品 ===== */
+  .works { margin-top: clamp(40px, 6vw, 72px); }
+  .works-head {
+    display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: baseline;
+    padding-bottom: 12px; border-bottom: 1px solid var(--rule-strong); margin-bottom: 8px;
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .works-head h3 { font-family: "Archivo Black", sans-serif; font-size: 22px; letter-spacing: -0.02em; text-transform: none; font-weight: 400; }
+  .works-head h3 .cn { font-family: "Noto Serif SC", serif; font-weight: 900; font-size: 18px; margin-left: 8px; }
+  .works-head .mid { color: var(--grey); }
+  .works-head .right { color: var(--grey); }
+  .works-grid { display: flex; flex-direction: column; gap: 0; }
+  .work {
+    min-width: 0; display: grid; align-items: center;
+    grid-template-columns: minmax(240px, 520px) minmax(0, 1fr);
+    grid-template-areas: "frame cap";
+    gap: clamp(28px, 4.5vw, 72px);
+    padding: clamp(36px, 5vw, 64px) 0;
+  }
+  .work + .work { border-top: 1px solid var(--rule); }
+  .work:nth-child(even) {
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 520px);
+    grid-template-areas: "cap frame";
+  }
+  .work.install {
+    grid-template-columns: minmax(0, 700px) minmax(280px, 1fr);
+  }
+  .work.install:nth-child(even) {
+    grid-template-columns: minmax(280px, 1fr) minmax(0, 700px);
+  }
+  .work-frame {
+    grid-area: frame; position: relative; overflow: hidden; width: 100%; min-width: 0;
+    border: 1px solid var(--rule-strong);
+    background: color-mix(in srgb, var(--bg) 94%, var(--ch-accent));
+    aspect-ratio: 3 / 4;
+  }
+  .work.install .work-frame {
+    aspect-ratio: 4 / 3; background: #ddd;
+  }
+  .work-frame > svg, .work-frame > canvas, .work-frame > img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .work-frame > img { object-fit: cover; object-position: center center; }
+  .work-frame canvas { cursor: crosshair; touch-action: pan-y; }
+  .work-tag {
+    position: absolute; top: 10px; left: 12px; z-index: 2; pointer-events: none;
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    background: var(--ink); color: var(--bg); padding: 3px 6px;
+  }
+  .work-hint {
+    position: absolute; bottom: 10px; left: 12px; right: 12px; z-index: 2; pointer-events: none;
+    display: flex; justify-content: space-between; gap: 8px;
+    font-family: "IBM Plex Mono", monospace; font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--grey);
+  }
+  .work-hint span { background: color-mix(in srgb, var(--bg) 88%, transparent); padding: 2px 4px; }
+  .work-cap { grid-area: cap; padding-top: 0; max-width: 38em; justify-self: start; width: 100%; }
+  .work:nth-child(even) .work-cap { justify-self: end; }
+  .work-cap .no {
+    font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--grey); display: flex; justify-content: space-between; gap: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--rule);
+  }
+  .work-cap .no b { color: var(--ink); font-weight: 500; }
+  .work-cap .no b::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--ch-accent); margin-right: 6px; vertical-align: 0; }
+  .work-cap .t { margin-top: 10px; font-size: 17px; font-weight: 600; line-height: 1.25; letter-spacing: -0.01em; }
+  .work-cap .t .cn { font-family: "Noto Serif SC", serif; font-weight: 900; font-size: 15px; margin-left: 6px; }
+  .work-cap .m { margin-top: 4px; font-family: "IBM Plex Mono", monospace; font-size: 10.5px; line-height: 1.5; color: var(--grey); letter-spacing: 0.02em; }
+  .work-cap .d { margin-top: 8px; font-size: 13px; line-height: 1.55; color: #3a3a38; max-width: 46ch; text-wrap: pretty; }
+  .work-cap .d-cn { margin-top: 4px; font-family: "Noto Sans SC", sans-serif; font-size: 12px; line-height: 1.65; color: var(--grey); max-width: 40em; text-wrap: pretty; }
+  @media (max-width: 980px) {
+    .works-head { grid-template-columns: 1fr auto; }
+    .works-head .mid { display: none; }
+    .work, .work:nth-child(even), .work.install {
+      grid-template-columns: 1fr;
+      grid-template-areas: "frame" "cap";
+      gap: 18px; align-items: start;
+      padding: 32px 0;
+    }
+    .work-frame, .work.install .work-frame { width: 100%; }
+    .work.flat .work-frame, .work.motion .work-frame { aspect-ratio: 3 / 4; }
+    .work-cap, .work:nth-child(even) .work-cap { justify-self: stretch; max-width: none; }
+  }
+
   /* ===== v4 kinetic layer ===== */
   [data-burst] { cursor: pointer; }
   .sr-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
@@ -925,6 +1006,41 @@
           </div>
         </div>
       </div>
+      <div class="works reveal" id="works-tide" aria-label="Works · 潮汐展品">
+        <div class="works-head"><h3>Works<span class="cn">展品</span></h3><span class="mid">TIDE 潮汐 · Graphic / Motion / Installation</span><span class="right">No.07-A — C</span></div>
+        <div class="works-grid">
+          <figure class="work flat">
+            <div class="work-frame"><span class="work-tag">07-A</span><svg viewBox="0 0 300 400" data-work-svg="tide" role="img" aria-label="Spring / Neap — 大潮与小潮"></svg></div>
+            <figcaption class="work-cap">
+              <div class="no"><b>No.07-A</b><span>Graphic</span></div>
+              <p class="t">Spring / Neap<span class="cn">大潮与小潮</span></p>
+              <p class="m">2026 · Digital print on cotton rag, 120 × 160 cm</p>
+              <p class="d">Twenty-eight discs, one for each day of a lunar month. The slices shear furthest at new and full moon, when sun and moon pull together.</p>
+              <p class="d-cn">二十八枚圆盘对应一个月里的每一天。新月与满月时日月同向牵引，切片错得最开。</p>
+            </figcaption>
+          </figure>
+          <figure class="work motion">
+            <div class="work-frame"><span class="work-tag">07-B</span><canvas data-work-motion="tide" aria-label="Tideline — 潮线, interactive"></canvas><div class="work-hint"><span>Move cursor · Raise the tide</span><span>Live</span></div></div>
+            <figcaption class="work-cap">
+              <div class="no"><b>No.07-B</b><span>Motion</span></div>
+              <p class="t">Tideline<span class="cn">潮线</span></p>
+              <p class="m">2026 · Generative, real-time · browser, variable size</p>
+              <p class="d">Rows of dots rise and fall on a slow sine. Your cursor sets the water level, and the sea always settles back.</p>
+              <p class="d-cn">一排排点随正弦缓慢起落。光标决定水位，潮水总会回落。</p>
+            </figcaption>
+          </figure>
+          <figure class="work install">
+            <div class="work-frame"><span class="work-tag">07-C</span><img src="works/tide-installation.jpg" alt="Suspended Tide — installation render: Red slats hang together as one disc. Air moving through the room pushes them out of line, and gravity draws them back." loading="lazy" decoding="async" width="1152" height="864" /></div>
+            <figcaption class="work-cap">
+              <div class="no"><b>No.07-C</b><span>Installation</span></div>
+              <p class="t">Suspended Tide<span class="cn">悬潮</span></p>
+              <p class="m">2026 · Powder-coated aluminium slats, steel wire, 520 × 480 × 60 cm</p>
+              <p class="d">Red slats hang together as one disc. Air moving through the room pushes them out of line, and gravity draws them back.</p>
+              <p class="d-cn">红色铝条悬吊成一枚圆盘。展厅里的气流把它们推散，引力又把它们拉回原位。</p>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
     </div>
     <div class="chapter-wash-ink" aria-hidden="true">
       <div class="strip-track">
@@ -971,6 +1087,41 @@
             <div class="stage-index"><span>No.08</span><span>MOON / 月相</span></div>
             <div class="motif-caption"><span>Move cursor · Scroll · Tumble</span><span>Click · Shatter</span></div>
           </div>
+        </div>
+      </div>
+      <div class="works reveal" id="works-moon" aria-label="Works · 月相展品">
+        <div class="works-head"><h3>Works<span class="cn">展品</span></h3><span class="mid">MOON 月相 · Graphic / Motion / Installation</span><span class="right">No.08-A — C</span></div>
+        <div class="works-grid">
+          <figure class="work flat">
+            <div class="work-frame"><span class="work-tag">08-A</span><svg viewBox="0 0 300 400" data-work-svg="moon" role="img" aria-label="Synodic Month — 朔望月"></svg></div>
+            <figcaption class="work-cap">
+              <div class="no"><b>No.08-A</b><span>Graphic</span></div>
+              <p class="t">Synodic Month<span class="cn">朔望月</span></p>
+              <p class="m">2026 · Digital print on cotton rag, 120 × 160 cm</p>
+              <p class="d">All 29 phases on one orbit, read clockwise from the new moon. The number in the middle is the length of the cycle in days.</p>
+              <p class="d-cn">二十九个月相排成一圈，自新月起顺时针阅读。中间的数字是一个周期的天数。</p>
+            </figcaption>
+          </figure>
+          <figure class="work motion">
+            <div class="work-frame"><span class="work-tag">08-B</span><canvas data-work-motion="moon" aria-label="Phase Scrubber — 月相刻度, interactive"></canvas><div class="work-hint"><span>Scroll · Hover to scrub</span><span>Live</span></div></div>
+            <figcaption class="work-cap">
+              <div class="no"><b>No.08-B</b><span>Motion</span></div>
+              <p class="t">Phase Scrubber<span class="cn">月相刻度</span></p>
+              <p class="m">2026 · Generative, real-time · browser, variable size</p>
+              <p class="d">Scroll the page and the moon passes through its month. Hover over the frame to scrub the phases by hand.</p>
+              <p class="d-cn">滚动页面，月亮走完它的一个月；悬停在画框上可以手动拨动月相。</p>
+            </figcaption>
+          </figure>
+          <figure class="work install">
+            <div class="work-frame"><span class="work-tag">08-C</span><img src="works/moon-installation.jpg" alt="Fallen Crescents — installation render: Blue crescents are piled in the middle of the room and scattered out towards the walls. Visitors can walk between them." loading="lazy" decoding="async" width="1152" height="864" /></div>
+            <figcaption class="work-cap">
+              <div class="no"><b>No.08-C</b><span>Installation</span></div>
+              <p class="t">Fallen Crescents<span class="cn">落月</span></p>
+              <p class="m">2026 · Lacquered fibreglass crescents, dimensions variable (approx. 800 × 600 cm floor)</p>
+              <p class="d">Blue crescents are piled in the middle of the room and scattered out towards the walls. Visitors can walk between them.</p>
+              <p class="d-cn">蓝色月牙堆在展厅中央，又一路散落到墙边，观众可以在其间穿行。</p>
+            </figcaption>
+          </figure>
         </div>
       </div>
     </div>
@@ -1021,6 +1172,41 @@
           </div>
         </div>
       </div>
+      <div class="works reveal" id="works-wind" aria-label="Works · 风展品">
+        <div class="works-head"><h3>Works<span class="cn">展品</span></h3><span class="mid">WIND 风 · Graphic / Motion / Installation</span><span class="right">No.09-A — C</span></div>
+        <div class="works-grid">
+          <figure class="work flat">
+            <div class="work-frame"><span class="work-tag">09-A</span><svg viewBox="0 0 300 400" data-work-svg="wind" role="img" aria-label="Beaufort 0—12 — 蒲福风级"></svg></div>
+            <figcaption class="work-cap">
+              <div class="no"><b>No.09-A</b><span>Graphic</span></div>
+              <p class="t">Beaufort 0—12<span class="cn">蒲福风级</span></p>
+              <p class="m">2026 · Digital print on cotton rag, 120 × 160 cm</p>
+              <p class="d">Thirteen hanging strips, one for each force on the Beaufort scale, from flat calm to hurricane.</p>
+              <p class="d-cn">十三条垂挂的色带，对应蒲福风级 0 至 12 级，从无风到飓风。</p>
+            </figcaption>
+          </figure>
+          <figure class="work motion">
+            <div class="work-frame"><span class="work-tag">09-B</span><canvas data-work-motion="wind" aria-label="Flow Field — 流场, interactive"></canvas><div class="work-hint"><span>Move cursor · Push the wind</span><span>Live</span></div></div>
+            <figcaption class="work-cap">
+              <div class="no"><b>No.09-B</b><span>Motion</span></div>
+              <p class="t">Flow Field<span class="cn">流场</span></p>
+              <p class="m">2026 · Generative, real-time · browser, variable size</p>
+              <p class="d">Particles drift along an invisible wind. Move your cursor through them to push them aside, and the current slowly closes behind you.</p>
+              <p class="d-cn">粒子沿着看不见的风流动。用光标拨开它们，气流会在身后慢慢合拢。</p>
+            </figcaption>
+          </figure>
+          <figure class="work install">
+            <div class="work-frame"><span class="work-tag">09-C</span><img src="works/wind-installation.jpg" alt="Twelve Breaths — installation render: Twelve green curtains hang from a single rail. Fans on staggered timers lift them one after another, so the wall seems to breathe." loading="lazy" decoding="async" width="1152" height="864" /></div>
+            <figcaption class="work-cap">
+              <div class="no"><b>No.09-C</b><span>Installation</span></div>
+              <p class="t">Twelve Breaths<span class="cn">十二次呼吸</span></p>
+              <p class="m">2026 · Polyester voile, aluminium ceiling track, timed floor fans, 1200 × 480 cm</p>
+              <p class="d">Twelve green curtains hang from a single rail. Fans on staggered timers lift them one after another, so the wall seems to breathe.</p>
+              <p class="d-cn">十二幅绿色纱帘挂在同一条轨道上。错开定时的风扇依次吹起它们，整面墙像在呼吸。</p>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
     </div>
     <div class="chapter-wash-ink" aria-hidden="true">
       <div class="strip-track">
@@ -1067,6 +1253,41 @@
             <div class="stage-index"><span>No.10</span><span>ECHO / 回声</span></div>
             <div class="motif-caption"><span>Hover · Interference</span><span>Click · Shatter</span></div>
           </div>
+        </div>
+      </div>
+      <div class="works reveal" id="works-echo" aria-label="Works · 回声展品">
+        <div class="works-head"><h3>Works<span class="cn">展品</span></h3><span class="mid">ECHO 回声 · Graphic / Motion / Installation</span><span class="right">No.10-A — C</span></div>
+        <div class="works-grid">
+          <figure class="work flat">
+            <div class="work-frame"><span class="work-tag">10-A</span><svg viewBox="0 0 300 400" data-work-svg="echo" role="img" aria-label="Interference — 干涉"></svg></div>
+            <figcaption class="work-cap">
+              <div class="no"><b>No.10-A</b><span>Graphic</span></div>
+              <p class="t">Interference<span class="cn">干涉</span></p>
+              <p class="m">2026 · Digital print on cotton rag, 120 × 160 cm</p>
+              <p class="d">Two sets of rings spread from two points. Where they cross, a third pattern appears that neither source contains.</p>
+              <p class="d-cn">两组同心环从两点扩散。它们交叠之处，出现了第三种图案。</p>
+            </figcaption>
+          </figure>
+          <figure class="work motion">
+            <div class="work-frame"><span class="work-tag">10-B</span><canvas data-work-motion="echo" aria-label="Ripple Tank — 涟漪池, interactive"></canvas><div class="work-hint"><span>Click · Emit a ripple</span><span>Live</span></div></div>
+            <figcaption class="work-cap">
+              <div class="no"><b>No.10-B</b><span>Motion</span></div>
+              <p class="t">Ripple Tank<span class="cn">涟漪池</span></p>
+              <p class="m">2026 · Generative, real-time · browser, variable size</p>
+              <p class="d">Click anywhere to drop a sound into the tank. The rings spread, meet each other and fade away.</p>
+              <p class="d-cn">在任意处点击，把一个声音投进水池。圆环扩散、相遇，然后消散。</p>
+            </figcaption>
+          </figure>
+          <figure class="work install">
+            <div class="work-frame"><span class="work-tag">10-C</span><img src="works/echo-installation.jpg" alt="Resonant Rings — installation render: Nested rings hang in a darkened room, each carrying a small speaker. A single tone travels from ring to ring and comes back." loading="lazy" decoding="async" width="1152" height="864" /></div>
+            <figcaption class="work-cap">
+              <div class="no"><b>No.10-C</b><span>Installation</span></div>
+              <p class="t">Resonant Rings<span class="cn">共振环</span></p>
+              <p class="m">2026 · Powder-coated steel rings, multichannel sound, Ø 60–420 cm</p>
+              <p class="d">Nested rings hang in a darkened room, each carrying a small speaker. A single tone travels from ring to ring and comes back.</p>
+              <p class="d-cn">嵌套的圆环悬在暗下来的展厅里，每一环都带着一只小音箱。一个音从一环传到下一环，又传回来。</p>
+            </figcaption>
+          </figure>
         </div>
       </div>
     </div>
@@ -1779,6 +2000,280 @@
     };
     requestAnimationFrame(loop);
   }
+})();
+
+</script>
+<script>
+/* ===== v5 works / 展品 — graphic SVGs + motion canvases ===== */
+(() => {
+  "use strict";
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const C = { tide: "#FF3B1F", moon: "#2B3BFF", wind: "#12A150", echo: "#F2A900", ink: "#111111", bg: "#EFECE4", grey: "#6B6B68" };
+  const MONO = "'IBM Plex Mono', monospace", DISP = "'Archivo Black', sans-serif", SERIF = "'Noto Serif SC', serif";
+  const f = (n) => n.toFixed(2);
+  const txt = (x, y, s, o = {}) => `<text x="${x}" y="${y}" font-family="${o.ff || MONO}" font-size="${o.fs || 8}" fill="${o.fill || C.ink}" ${o.anchor ? `text-anchor="${o.anchor}"` : ""} ${o.ls ? `letter-spacing="${o.ls}"` : ""} ${o.w ? `font-weight="${o.w}"` : ""}>${s}</text>`;
+  const frameTxt = (code, right, foot, footCn) =>
+    txt(280, 28, right, { anchor: "end", ls: 1, fill: C.grey }) +
+    `<line x1="20" y1="36" x2="280" y2="36" stroke="${C.ink}" stroke-opacity=".3" stroke-width=".6"/>` +
+    `<line x1="20" y1="362" x2="280" y2="362" stroke="${C.ink}" stroke-opacity=".3" stroke-width=".6"/>` +
+    txt(20, 382, foot, { ff: DISP, fs: 15, ls: -0.3 }) + txt(280, 381, footCn, { ff: SERIF, fs: 12, anchor: "end", w: 900 });
+
+  /* circle band: part of a circle (cx,cy,r) between y0..y1 (relative to cy), shifted dx */
+  function band(cx, cy, r, y0, y1, dx) {
+    const N = 6, L = [], R = [];
+    for (let i = 0; i <= N; i++) {
+      const y = y0 + (y1 - y0) * i / N, w = Math.sqrt(Math.max(0, r * r - y * y));
+      L.push([cx + dx - w, cy + y]); R.push([cx + dx + w, cy + y]);
+    }
+    const pts = L.concat(R.reverse());
+    return "M" + pts.map((p) => f(p[0]) + "," + f(p[1])).join("L") + "Z";
+  }
+  /* moon phase path, p in [0,1): 0 new, .5 full */
+  function phasePath(cx, cy, r, p) {
+    const k = Math.cos(2 * Math.PI * p), rx = Math.abs(k) * r, wax = p < 0.5;
+    const so = wax ? 1 : 0, si = wax ? (k > 0 ? 0 : 1) : (k > 0 ? 1 : 0);
+    return `M${f(cx)},${f(cy - r)}A${f(r)},${f(r)} 0 0 ${so} ${f(cx)},${f(cy + r)}A${f(rx)},${f(r)} 0 0 ${si} ${f(cx)},${f(cy - r)}Z`;
+  }
+
+  const GRAPHIC = {
+    tide() {
+      let g = "";
+      const cols = 4, rows = 7, x0 = 20, cw = 65, y0 = 44, rh = 45.4, r = 18.5, nb = 6;
+      for (let d = 0; d < 28; d++) {
+        const c = d % cols, ro = Math.floor(d / cols);
+        const cx = x0 + cw * c + cw / 2, cy = y0 + rh * ro + rh / 2;
+        const A = (1 + Math.cos(4 * Math.PI * d / 29.53)) / 2; // spring tides near new/full moon
+        const gap = 0.6 + 1.6 * A;
+        const bh = (2 * r - gap * (nb - 1)) / nb;
+        for (let b = 0; b < nb; b++) {
+          const ya = -r + b * (bh + gap), yb = ya + bh;
+          const dx = (b % 2 ? 1 : -1) * A * (2 + 7 * b / (nb - 1));
+          g += `<path d="${band(cx, cy, r, ya, yb, dx)}" fill="${C.tide}"/>`;
+        }
+        g += txt(cx - cw / 2 + 4, cy - rh / 2 + 8, String(d + 1).padStart(2, "0"), { fs: 5.5, fill: C.grey });
+      }
+      return frameTxt("No.07-A", "SPRING / NEAP · 28 DAYS", "TIDE", "大潮与小潮") + g;
+    },
+    moon() {
+      const cx = 150, cy = 199, R = 118, r = 11.5;
+      let g = `<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${C.ink}" stroke-opacity=".22" stroke-width=".6" stroke-dasharray="1.5 3"/>`;
+      for (let i = 0; i < 29; i++) {
+        const p = i / 29.53, a = -Math.PI / 2 + 2 * Math.PI * i / 29;
+        const x = cx + R * Math.cos(a), y = cy + R * Math.sin(a);
+        g += `<circle cx="${f(x)}" cy="${f(y)}" r="${r}" fill="${C.bg}" stroke="${C.ink}" stroke-opacity=".35" stroke-width=".6"/>`;
+        if (i) g += `<path d="${phasePath(x, y, r, p)}" fill="${C.moon}"/>`;
+        const lx = cx + (R - 24) * Math.cos(a), ly = cy + (R - 24) * Math.sin(a) + 2;
+        g += txt(f(lx), f(ly), String(i + 1), { fs: 5.5, fill: C.grey, anchor: "middle" });
+      }
+      g += txt(cx, cy + 8, "29.53", { ff: DISP, fs: 40, fill: C.moon, anchor: "middle", ls: -1.5 });
+      g += txt(cx, cy + 24, "DAYS · NEW → NEW", { fs: 6.5, fill: C.grey, anchor: "middle", ls: 1 });
+      return frameTxt("No.08-A", "SYNODIC MONTH · 29 PHASES", "MOON", "朔望月") + g;
+    },
+    wind() {
+      let g = `<line x1="20" y1="58" x2="280" y2="58" stroke="${C.ink}" stroke-width="2"/>`;
+      const n = 13, x0 = 22, step = 16.2, w = 9, top = 58, H = 270;
+      for (let i = 0; i < n; i++) {
+        const x = x0 + i * step, dx = 1.05 * Math.pow(i, 1.55);
+        const by = top + Math.sqrt(Math.max(0, H * H - dx * dx * 0.9));
+        const c1y = top + H * 0.45, c2y = top + H * 0.8;
+        const d = `M${f(x)},${top}C${f(x)},${f(c1y)} ${f(x + dx * 0.25)},${f(c2y)} ${f(x + dx)},${f(by)}L${f(x + dx + w)},${f(by - dx * 0.04)}C${f(x + w + dx * 0.25)},${f(c2y)} ${f(x + w)},${f(c1y)} ${f(x + w)},${top}Z`;
+        g += `<path d="${d}" fill="${C.wind}" fill-opacity="${f(0.55 + 0.45 * i / 12)}"/>`;
+        g += `<circle cx="${f(x + w / 2)}" cy="${top}" r="1.6" fill="${C.ink}"/>`;
+        g += txt(f(x + w / 2), 350, String(i), { fs: 7, anchor: "middle", fill: i === 0 || i === 12 ? C.ink : C.grey });
+      }
+      g += txt(20, 50, "CALM", { fs: 6, fill: C.grey, ls: 1 }) + txt(280, 50, "HURRICANE", { fs: 6, fill: C.grey, ls: 1, anchor: "end" });
+      return frameTxt("No.09-A", "BEAUFORT SCALE · FORCE 0—12", "WIND", "蒲福风级") + g;
+    },
+    echo() {
+      const id = "ecw" + Math.random().toString(36).slice(2, 7);
+      let a = "", b = "";
+      for (let r = 6; r < 300; r += 9) {
+        a += `<circle cx="112" cy="168" r="${r}" fill="none" stroke="${C.echo}" stroke-width="3.6"/>`;
+        b += `<circle cx="196" cy="252" r="${r}" fill="none" stroke="${C.ink}" stroke-width="1.4"/>`;
+      }
+      const g = `<defs><clipPath id="${id}"><rect x="20" y="44" width="260" height="310"/></clipPath></defs><g clip-path="url(#${id})">${a}<g opacity=".82">${b}</g></g>` +
+        `<circle cx="112" cy="168" r="3" fill="${C.ink}"/><circle cx="196" cy="252" r="3" fill="${C.echo}" stroke="${C.ink}" stroke-width=".8"/>`;
+      return frameTxt("No.10-A", "TWO SOURCES · ONE FIELD", "ECHO", "干涉") + g;
+    }
+  };
+  document.querySelectorAll("svg[data-work-svg]").forEach((svg) => {
+    const fn = GRAPHIC[svg.dataset.workSvg]; if (fn) svg.innerHTML = fn();
+  });
+
+  /* ---------- motion works ---------- */
+  const works = [];
+  function setup(cv, init) {
+    const ctx = cv.getContext("2d");
+    const w = { cv, ctx, W: 0, H: 0, dpr: 1, visible: false, t: 0, m: { on: false, x: 0, y: 0, vx: 0, vy: 0 } };
+    const fit = () => {
+      const r = cv.getBoundingClientRect(); w.dpr = Math.min(2, window.devicePixelRatio || 1);
+      w.W = Math.max(1, r.width); w.H = Math.max(1, r.height);
+      cv.width = Math.round(w.W * w.dpr); cv.height = Math.round(w.H * w.dpr);
+      ctx.setTransform(w.dpr, 0, 0, w.dpr, 0, 0);
+      w.resize && w.resize(); w.draw(w.t, 0);
+    };
+    cv.addEventListener("pointermove", (e) => {
+      const r = cv.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+      if (w.m.on) { w.m.vx = x - w.m.x; w.m.vy = y - w.m.y; }
+      w.m.x = x; w.m.y = y; w.m.on = true;
+    });
+    cv.addEventListener("pointerleave", () => { w.m.on = false; w.m.vx = w.m.vy = 0; });
+    init(w);
+    works.push(w);
+    if ("ResizeObserver" in window) new ResizeObserver(fit).observe(cv); else window.addEventListener("resize", fit);
+    fit();
+    return w;
+  }
+
+  const MOTION = {
+    tide(w) {
+      let level = 0.42, amp = 1;
+      w.draw = (t, dt) => {
+        const { ctx, W, H, m } = w;
+        const target = m.on ? Math.min(0.85, Math.max(0.12, m.y / H)) : 0.42 + 0.06 * Math.sin(t * 0.35);
+        level += (target - level) * Math.min(1, dt * 2.2);
+        amp += ((m.on ? 1.8 : 1) - amp) * Math.min(1, dt * 2);
+        ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = "rgba(255,59,31,0.06)"; ctx.fillRect(0, 0, W, H);
+        const sx = Math.max(10, W / 30), rows = 22, gap = Math.max(10, H / 34);
+        // moon disc that sinks as the water rises
+        const mr = W * 0.12, my = H * 0.08 + mr + (1 - level) * H * 0.05;
+        ctx.fillStyle = C.ink; ctx.beginPath(); ctx.arc(W * 0.72, my, mr * 0.55, 0, 7); ctx.fill();
+        for (let k = 0; k < rows; k++) {
+          const base = level * H + k * gap * (1 + k * 0.035);
+          if (base - 30 > H) break;
+          for (let x = sx / 2; x < W; x += sx) {
+            const near = m.on ? Math.exp(-Math.pow((x - m.x) / (W * 0.18), 2)) : 0;
+            const y = base + (6 + 10 * amp * (1 - k / rows)) * Math.sin(x * 0.018 + t * 1.3 - k * 0.45) + near * -18 * (1 - k / rows) * Math.sin(t * 3 - k * 0.6);
+            const rr = k === 0 ? 2.6 : Math.max(0.8, 2.2 - k * 0.06);
+            ctx.fillStyle = k === 0 ? C.ink : C.tide; ctx.globalAlpha = k === 0 ? 1 : Math.max(0.25, 1 - k * 0.035);
+            ctx.beginPath(); ctx.arc(x, y, rr, 0, 7); ctx.fill();
+          }
+        }
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = C.grey; ctx.font = `10px ${MONO}`; ctx.textAlign = "right";
+        ctx.fillText("LEVEL " + Math.round((1 - level) * 100).toString().padStart(2, "0"), W - 12, 22);
+      };
+    },
+    moon(w) {
+      let p = 0.1, hoverP = null;
+      const scrollP = () => {
+        const r = w.cv.getBoundingClientRect(), vh = window.innerHeight;
+        const prog = (vh - r.top) / (vh + r.height); // 0 → 1 as it passes through viewport
+        return ((Math.min(1, Math.max(0, prog)) * 1.0) % 1 + 1) % 1;
+      };
+      w.draw = (t, dt) => {
+        const { ctx, W, H, m } = w;
+        hoverP = m.on ? Math.min(0.999, Math.max(0, m.x / W)) : null;
+        const target = hoverP != null ? hoverP : scrollP();
+        p += (target - p) * Math.min(1, (dt || 1) * 6);
+        ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = "rgba(43,59,255,0.05)"; ctx.fillRect(0, 0, W, H);
+        const cx = W / 2, cy = H * 0.43, R = Math.min(W, H) * 0.33;
+        ctx.strokeStyle = "rgba(17,17,17,.3)"; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(cx, cy, R, 0, 7); ctx.stroke();
+        if (p > 0.004 && p < 0.996) { ctx.fillStyle = C.moon; ctx.fill(new Path2D(phasePath(cx, cy, R, p))); }
+        // day ticks
+        const ty = H * 0.82, x0 = W * 0.1, x1 = W * 0.9, day = Math.round(p * 29.53) % 30;
+        for (let i = 0; i < 30; i++) {
+          const x = x0 + (x1 - x0) * i / 29, on = i === day;
+          ctx.fillStyle = on ? C.moon : (i <= day ? C.ink : "rgba(17,17,17,.3)");
+          ctx.fillRect(x - (on ? 1.5 : 0.5), ty - (on ? 14 : i % 7 === 0 ? 9 : 5), on ? 3 : 1, on ? 14 : i % 7 === 0 ? 9 : 5);
+        }
+        ctx.font = `10px ${MONO}`; ctx.fillStyle = C.ink; ctx.textAlign = "left";
+        ctx.fillText("DAY " + String(day).padStart(2, "0") + " / 29.53", x0, ty + 18);
+        ctx.textAlign = "right"; ctx.fillStyle = C.grey;
+        const names = ["NEW", "WAXING CRESCENT", "FIRST QUARTER", "WAXING GIBBOUS", "FULL", "WANING GIBBOUS", "LAST QUARTER", "WANING CRESCENT"];
+        ctx.fillText(names[Math.round(p * 8) % 8], x1, ty + 18);
+      };
+    },
+    wind(w) {
+      let P = [];
+      const N = () => Math.round(Math.min(900, (w.W * w.H) / 160));
+      const seed = () => ({ x: Math.random() * w.W, y: Math.random() * w.H, vx: 0, vy: 0, life: 60 + Math.random() * 200, c: Math.random() < 0.12 });
+      w.resize = () => { P = Array.from({ length: N() }, seed); w.clear = true; };
+      const field = (x, y, t) => {
+        const s = 0.006;
+        return 0.35 * Math.PI * (Math.sin(x * s + t * 0.25) * Math.cos(y * s * 1.3 - t * 0.18) + 0.6 * Math.sin((x + y) * s * 0.7 + t * 0.1));
+      };
+      w.draw = (t, dt) => {
+        const { ctx, W, H, m } = w;
+        if (w.clear || !dt) { ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H); w.clear = false; }
+        ctx.fillStyle = "rgba(239,236,228,0.10)"; ctx.fillRect(0, 0, W, H);
+        const steps = dt ? 1 : 45;
+        for (let s = 0; s < steps; s++) {
+          if (s) { ctx.fillStyle = "rgba(239,236,228,0.07)"; ctx.fillRect(0, 0, W, H); }
+          for (const q of P) {
+            const a = field(q.x, q.y, t);
+            let ax = Math.cos(a) * 0.9 + 0.35, ay = Math.sin(a) * 0.9;
+            if (m.on) {
+              const dx = q.x - m.x, dy = q.y - m.y, d2 = dx * dx + dy * dy, R = 90;
+              if (d2 < R * R) { const d = Math.sqrt(d2) || 1, k = (1 - d / R) * 4; ax += dx / d * k + m.vx * 0.08; ay += dy / d * k + m.vy * 0.08; }
+            }
+            q.vx = q.vx * 0.86 + ax * 0.3; q.vy = q.vy * 0.86 + ay * 0.3;
+            const ox = q.x, oy = q.y; q.x += q.vx; q.y += q.vy; q.life--;
+            if (q.x > W + 4 || q.x < -4 || q.y > H + 4 || q.y < -4 || q.life < 0) { Object.assign(q, seed()); if (Math.random() < 0.7) q.x = -2; continue; }
+            ctx.strokeStyle = q.c ? C.ink : C.wind; ctx.lineWidth = q.c ? 1 : 1.4;
+            ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(q.x, q.y); ctx.stroke();
+          }
+        }
+        m.vx *= 0.8; m.vy *= 0.8;
+      };
+    },
+    echo(w) {
+      const em = []; let lastAuto = -9, lastUser = -9;
+      const add = (x, y, t) => { em.push({ x, y, t0: t }); if (em.length > 9) em.shift(); };
+      w.cv.addEventListener("pointerdown", (e) => {
+        const r = w.cv.getBoundingClientRect(); add(e.clientX - r.left, e.clientY - r.top, w.t); lastUser = w.t;
+        if (reduce) w.draw(w.t + 1.2, 0, true);
+      });
+      w.draw = (t, dt, manual) => {
+        const { ctx, W, H } = w;
+        if (!em.length && !manual) { add(W * 0.35, H * 0.38, t - 2.2); add(W * 0.66, H * 0.62, t - 1.1); }
+        if (dt && t - lastAuto > 2.6 && t - lastUser > 4) { add(W * (0.2 + Math.random() * 0.6), H * (0.2 + Math.random() * 0.6), t); lastAuto = t; }
+        ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = "rgba(242,169,0,0.06)"; ctx.fillRect(0, 0, W, H);
+        ctx.globalCompositeOperation = "multiply";
+        const sp = Math.min(W, H) * 0.16, maxAge = 6.5;
+        for (const e of em) {
+          const age = t - e.t0; if (age < 0 || age > maxAge) continue;
+          const fade = 1 - age / maxAge;
+          for (let j = 0; j < 7; j++) {
+            const r = age * sp - j * 14; if (r <= 0) continue;
+            ctx.strokeStyle = C.echo; ctx.globalAlpha = fade * (1 - j / 7); ctx.lineWidth = 5 - j * 0.5;
+            ctx.beginPath(); ctx.arc(e.x, e.y, r, 0, 7); ctx.stroke();
+          }
+          ctx.globalAlpha = Math.min(1, fade * 1.5); ctx.fillStyle = C.ink;
+          ctx.beginPath(); ctx.arc(e.x, e.y, 2.5, 0, 7); ctx.fill();
+        }
+        ctx.globalCompositeOperation = "source-over"; ctx.globalAlpha = 1;
+        while (em.length && t - em[0].t0 > maxAge) em.shift();
+        ctx.font = `10px ${MONO}`; ctx.fillStyle = C.grey; ctx.textAlign = "right";
+        ctx.fillText("SOURCES " + String(em.length).padStart(2, "0"), W - 12, 22);
+      };
+    }
+  };
+  document.querySelectorAll("canvas[data-work-motion]").forEach((cv) => {
+    const fn = MOTION[cv.dataset.workMotion]; if (fn) setup(cv, fn);
+  });
+  // static frame for reduced motion: render a representative moment
+  if (reduce) {
+    works.forEach((w) => { w.t = 2.4; w.draw(2.4, 0); });
+    window.addEventListener("scroll", () => works.forEach((w) => { if (w.cv.dataset.workMotion === "moon") w.draw(w.t, 0); }), { passive: true });
+    return;
+  }
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver((es) => es.forEach((e) => { const w = works.find((x) => x.cv === e.target); if (w) w.visible = e.isIntersecting; }), { rootMargin: "60px 0px" });
+    works.forEach((w) => io.observe(w.cv));
+  } else works.forEach((w) => (w.visible = true));
+  let last = performance.now();
+  const loop = (now) => {
+    const dt = Math.min(1 / 30, (now - last) / 1000); last = now;
+    for (const w of works) if (w.visible) { w.t += dt; w.draw(w.t, dt); }
+    requestAnimationFrame(loop);
+  };
+  requestAnimationFrame(loop);
+  window.__works = works;
 })();
 
 </script>
